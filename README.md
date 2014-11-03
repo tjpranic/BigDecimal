@@ -12,7 +12,7 @@ Build project with Visual Studio 2012 or higher and run.
 
 Future Considerations & Concerns
 -----------
-- Exponentiation sill needs implementing
+- Exponentiation still needs implementing
 - Division hasn't been thoroughly tested yet
 
 License
