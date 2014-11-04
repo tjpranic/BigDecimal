@@ -1,9 +1,9 @@
-﻿open System.Numerics
-
-open BigDecimal
+﻿open BigDecimal
+open Fraction
 
 [<EntryPoint>]
 let main argv =
+    (*
     //Same scale, won't go up/down in scale
     let z = new BigDecimal( "45.11" )
     let y = new BigDecimal( "12.15" )
@@ -39,5 +39,10 @@ let main argv =
     let y = new BigDecimal( "9.0" )
 
     printfn "%s" ( ( z.Exp( y ) ).ToString( ) ) //4605366583984375000000000
-
+    
+    let z = new BigDecimal( "8.0" )
+    let y = new BigDecimal( "-2.0" )
+    
+    printfn "%s" ( ( z.Exp( y ) ).ToString( ) ) //0.015625
+    *)
     0

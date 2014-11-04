@@ -133,8 +133,7 @@ type BigDecimal( number : string ) =
             if power.Integer >= 0I then
                 BigDecimal( pow( this.Integer, power.Integer ) )
             else
-                //TODO
-                BigDecimal( "0.0" )
+                ( new BigDecimal( "1.0" ) ) / ( new BigDecimal( pow( this.Integer, abs( power.Integer ) ) ) )
         else
             //TODO
             BigDecimal( "0.0" )
@@ -156,6 +155,21 @@ type BigDecimal( number : string ) =
                 "[Undisplayable]" //TODO: fix this
             else
                 let decimal_pos = s.Length - int( scale )
+                //In case the number is supposed to have leading zeros
+                let result =
+                    if decimal_pos < 0 then
+                        let rec adjust_integer( decimal_pos : int, s : string ) =
+                            if decimal_pos = 0 then
+                                ( decimal_pos, s )
+                            else
+                                adjust_integer( decimal_pos + 1, "0" + s )
+                        adjust_integer( decimal_pos, s )
+                    else
+                        ( decimal_pos, s )
+
+                let decimal_pos = fst( result )
+                let s = snd( result )    
+
                 s.Insert( decimal_pos, match decimal_pos with
                                        | 0 -> "0."
                                        | _ -> "." )
