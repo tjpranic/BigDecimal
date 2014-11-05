@@ -46,7 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigString.fs" />
+    <Compile Include="BigDecimal.fsi" />
     <Compile Include="BigDecimal.fs" />
+    <Compile Include="Fraction.fsi" />
     <Compile Include="Fraction.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

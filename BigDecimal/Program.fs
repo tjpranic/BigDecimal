@@ -1,9 +1,8 @@
-﻿open BigDecimal
-open Fraction
+﻿open BigDecimal.BigDecimal
+open BigDecimal.Fraction
 
 [<EntryPoint>]
 let main argv =
-    (*
     //Same scale, won't go up/down in scale
     let z = new BigDecimal( "45.11" )
     let y = new BigDecimal( "12.15" )
@@ -13,7 +12,7 @@ let main argv =
     printfn "%s" ( ( z * y ).ToString( ) ) //548.0865
     printfn "%s" ( ( z / y ).ToString( ) ) //3.7127572016460905349794238683... period 27
 
-    printfn "\n"
+    printf "\n"
 
     //Same scale, will go/down up in scale
     let z = new BigDecimal( "100.001" )
@@ -24,7 +23,7 @@ let main argv =
     printfn "%s" ( ( z * y ).ToString( ) ) //90001.800009
     printfn "%s" ( ( z / y ).ToString( ) ) //0.1... period 1
 
-    printfn "\n"
+    printf "\n"
 
     //Different scale
     let z = new BigDecimal( "152684.6666667" )
@@ -35,14 +34,18 @@ let main argv =
     printfn "%s" ( ( z * y ).ToString( ) ) //1252165424.486940033
     printfn "%s" ( ( z / y ).ToString( ) ) //18.617-[not typing the rest]-... period 247
 
+    printf "\n"
+
     let z = new BigDecimal( "550.0" )
     let y = new BigDecimal( "9.0" )
 
-    printfn "%s" ( ( z.Exp( y ) ).ToString( ) ) //4605366583984375000000000
+    printfn "%s" ( ( z.Pow( y ) ).ToString( ) ) //4605366583984375000000000
     
+    printf "\n"
+
     let z = new BigDecimal( "8.0" )
     let y = new BigDecimal( "-2.0" )
     
-    printfn "%s" ( ( z.Exp( y ) ).ToString( ) ) //0.015625
-    *)
+    printfn "%s" ( ( z.Pow( y ) ).ToString( ) ) //0.015625
+
     0
