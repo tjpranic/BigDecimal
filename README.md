@@ -14,6 +14,7 @@ Future Considerations & Concerns
 -----------
 - Exponentiation still needs implementing
 - Division hasn't been thoroughly tested yet
+- Sqrt needs implementing
 
 License
 -----------
