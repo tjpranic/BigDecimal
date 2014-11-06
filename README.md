@@ -1,7 +1,7 @@
 BigDecimal
 ==========
 
-Arbitrary precision decimal class, built on top of the .NET BigInteger, written in F#
+Arbitrary precision decimal class, built on top of the .NET BigInteger, written in F# + other stuff
 
 Usage
 -----------
