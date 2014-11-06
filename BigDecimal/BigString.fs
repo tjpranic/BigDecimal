@@ -1,6 +1,9 @@
-﻿module BigString
+﻿namespace BigDecimal
 
-//String that can be indexed into using BigIntegers
-type BigString( words : string ) =
-    
-    new( ) = BigString( "" )
+module BigString =
+
+    //String that can be indexed into using BigIntegers
+    //TODO: implement this
+    type BigString( words : string ) =
+        
+        new( ) = BigString( "" )

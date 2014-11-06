@@ -2,17 +2,13 @@
 
 module BigDecimal =
 
+    open BigDecimal.Utility
+
     open System
     open System.Numerics
 
-    let pow( n : bigint, x : bigint ) =
-        match x with
-        | _ when x = 0I -> 1I
-        | _ when x = 1I -> n
-        | _ -> [ for i in 1I..x do yield n ] |> List.reduce( * )
-
     type BigDecimal( number : string ) =
-
+        
         //Trim unnecessary zeros
         let number =
             let rec trim( number : string ) =
@@ -30,7 +26,10 @@ module BigDecimal =
                 trim( number ) //Trim anyway to make sure no leading zeros go through
             else
                 trim( number )
-    
+        
+        static member private MaxPrecision : bigint = 15I
+        static member get_Zero( ) = BigDecimal( 0 )
+
         //Number of zeros after the decimal point
         member public this.Scale : bigint =
             let index = number.IndexOf( '.' )
@@ -93,12 +92,17 @@ module BigDecimal =
         static member ( / )( self : BigDecimal, other : BigDecimal ) =
             //Align the divisor scale if necessary
             let readjusted_divisor =
-                if other.Integer < self.Integer then
+                if other.Scale < self.Scale then
                     other.Integer * ( pow( 10I, self.Scale - other.Scale ) )
                 else
                     other.Integer
+            let readjusted_dividend =
+                if other.Scale > self.Scale then
+                    self.Integer * ( pow( 10I, other.Scale - self.Scale ) )
+                else
+                    self.Integer
 
-            let result    = BigInteger.DivRem( self.Integer, readjusted_divisor )
+            let result    = BigInteger.DivRem( readjusted_dividend, readjusted_divisor )
             let quotient  = fst( result )
             let remainder = snd( result )
 
@@ -125,7 +129,7 @@ module BigDecimal =
                             |> List.rev
                             |> List.mapi( fun i x -> if i = 0 then x + "." else x ) //Add decimal point
                             |> List.reduce( + )
-                BigDecimal( long_divide( quotient, remainder, self.Integer, [] ) )
+                BigDecimal( long_divide( quotient, remainder, readjusted_dividend, [] ) )
             else
                 BigDecimal( quotient )
     
@@ -141,9 +145,13 @@ module BigDecimal =
                 else
                     ( new BigDecimal( "1.0" ) ) / ( new BigDecimal( pow( this.Integer, abs( power.Integer ) ) ) )
             else
-                //TODO
+                //TODO: implement this
                 //convert to power to fraction then x ^ a/b = bth root of x ^ a
                 BigDecimal( "0.0" )
+        
+        member public this.Sqrt( ) =
+            //TODO: implement this
+            BigDecimal( "0.0" )
 
         //Comparison
         interface IComparable with
@@ -152,7 +160,7 @@ module BigDecimal =
                     1
                 else
                     let other = obj :?> BigDecimal //Throws InvalidCastException on failure
-                    this.Integer.CompareTo( other.Integer )
+                    this.Integer.CompareTo( other.Integer ) //TODO: test this
 
         //Utility methods
         override this.ToString( ) =
@@ -167,8 +175,6 @@ module BigDecimal =
 
         override this.GetHashCode( ) =
             this.Integer.GetHashCode( )
-
-        static member private MaxPrecision : bigint = 15I
 
         static member private MakeString( integer : bigint, scale : bigint ) =
             let s = integer.ToString( )

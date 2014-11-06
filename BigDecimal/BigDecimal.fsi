@@ -1,30 +1,33 @@
 ﻿namespace BigDecimal
 
-    open System
-    open System.Numerics
+open System
+open System.Numerics
 
-    module BigDecimal =
+module BigDecimal =
         
-        type BigDecimal =
-            static member ( + ) : BigDecimal * BigDecimal -> BigDecimal
-            static member ( - ) : BigDecimal * BigDecimal -> BigDecimal
-            static member ( * ) : BigDecimal * BigDecimal -> BigDecimal
-            static member ( / ) : BigDecimal * BigDecimal -> BigDecimal
+    type BigDecimal =
+        static member get_Zero : unit -> BigDecimal
 
-            static member ( ~- ) : BigDecimal -> BigDecimal
+        static member ( + ) : BigDecimal * BigDecimal -> BigDecimal
+        static member ( - ) : BigDecimal * BigDecimal -> BigDecimal
+        static member ( * ) : BigDecimal * BigDecimal -> BigDecimal
+        static member ( / ) : BigDecimal * BigDecimal -> BigDecimal
 
-            member Pow : BigDecimal -> BigDecimal
+        static member ( ~- ) : BigDecimal -> BigDecimal
 
-            interface IComparable
+        member Pow  : BigDecimal -> BigDecimal
+        member Sqrt : unit -> BigDecimal
 
-            override ToString    : unit -> string
-            override Equals      : obj  -> bool
-            override GetHashCode : unit -> int
+        interface IComparable
 
-            new : string  -> BigDecimal
-            new : decimal -> BigDecimal
-            new : double  -> BigDecimal
-            new : int32   -> BigDecimal
-            new : int64   -> BigDecimal
-            new : bigint  -> BigDecimal
-            new : unit    -> BigDecimal
+        override ToString    : unit -> string
+        override Equals      : obj  -> bool
+        override GetHashCode : unit -> int
+
+        new : string  -> BigDecimal
+        new : decimal -> BigDecimal
+        new : double  -> BigDecimal
+        new : int32   -> BigDecimal
+        new : int64   -> BigDecimal
+        new : bigint  -> BigDecimal
+        new : unit    -> BigDecimal

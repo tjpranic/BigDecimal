@@ -1,8 +1,36 @@
 ﻿open BigDecimal.BigDecimal
 open BigDecimal.Fraction
+open BigDecimal.Utility
+
+// 1/pi = sqrt( 8 ) / 9801 *
+//        sum[0->inf]( 
+//            ( (4n)! / (n!)^4 ) * 
+//            ( ( 26390n + 1103 ) / 396^(4n) ) ) 
+//        )
+let pi_ramanujan( ) =
+    let max_iterations = 5I
+
+    let first_terms = new BigDecimal( sqrt( 8.0 ) / 9801.0 )
+
+    let second_terms( n : bigint ) =
+        ( new BigDecimal( fac( 4I * n ) ) ) / ( new BigDecimal( pow( fac( n ), 4I ) ) ) *
+        ( new BigDecimal( ( 26390I * n ) + 1103I ) ) / ( new BigDecimal( pow( 396I, ( 4I * n ) ) ) )
+
+    let result =
+        ( first_terms * ( new BigDecimal( 1103 ) ) ) + //iteration when n = 0
+        ( first_terms * ( [ for k in 1I..max_iterations do yield second_terms( k ) ] |> List.sum ) ) //iteration when n > 0
+
+    ( new BigDecimal( 1 ) ) / result
 
 [<EntryPoint>]
 let main argv =
+    let pi = pi_ramanujan( )
+    printfn "%A" pi
+
+    0
+
+(*
+let tests( ) =
     //Same scale, won't go up/down in scale
     let z = new BigDecimal( "45.11" )
     let y = new BigDecimal( "12.15" )
@@ -36,6 +64,7 @@ let main argv =
 
     printf "\n"
 
+    //Powers
     let z = new BigDecimal( "550.0" )
     let y = new BigDecimal( "9.0" )
 
@@ -43,9 +72,9 @@ let main argv =
     
     printf "\n"
 
+    //Negative powers (reciprocals)
     let z = new BigDecimal( "8.0" )
     let y = new BigDecimal( "-2.0" )
     
     printfn "%s" ( ( z.Pow( y ) ).ToString( ) ) //0.015625
-
-    0
+*)

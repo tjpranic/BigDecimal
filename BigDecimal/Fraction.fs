@@ -3,15 +3,9 @@
 module Fraction =
 
     open BigDecimal.BigDecimal
+    open BigDecimal.Utility
 
     open System
-
-    //Get greatest common divisor of two numbers
-    let rec gcd( x : bigint, y : bigint ) =
-        if y = 0I then
-            x
-        else
-            gcd( y, ( x % y ) )
 
     type Fraction( numerator : bigint, denominator : bigint ) =
     
