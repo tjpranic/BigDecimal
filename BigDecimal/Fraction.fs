@@ -8,10 +8,12 @@ module Fraction =
     open System
 
     type Fraction( numerator : bigint, denominator : bigint ) =
-    
+        
         do
             if denominator = bigint 0 then
                 raise( new DivideByZeroException( "Denominator cannot be 0" ) )
+
+        static member get_Zero( ) = Fraction( 0I, 1I )
 
         member public this.Numerator   = numerator
         member public this.Denominator = denominator

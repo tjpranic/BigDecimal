@@ -5,7 +5,8 @@ module Fraction =
     open BigDecimal.BigDecimal
 
     type Fraction =
-            
+        static member get_Zero : unit -> Fraction
+
         member public Numerator   : bigint
         member public Denominator : bigint
         member public Decimal     : BigDecimal

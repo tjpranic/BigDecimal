@@ -2,6 +2,13 @@
 
 module Utility =
     
+    //Get greatest common divisor of two numbers
+    let rec gcd( x : bigint, y : bigint ) =
+        if y = 0I then
+            x
+        else
+            gcd( y, ( x % y ) )
+
     //Factorial for bigints (does not accept negatives)
     let fac( n : bigint ) =
         match n with
@@ -16,9 +23,6 @@ module Utility =
         | _ when x = 1I -> n
         | _ -> [ for i in 1I..x do yield n ] |> List.reduce( * )
 
-    //Get greatest common divisor of two numbers
-    let rec gcd( x : bigint, y : bigint ) =
-        if y = 0I then
-            x
-        else
-            gcd( y, ( x % y ) )
+    //Reverse a string
+    let rev( s : string ) =
+        new string( s.ToCharArray( ) |> Array.rev )

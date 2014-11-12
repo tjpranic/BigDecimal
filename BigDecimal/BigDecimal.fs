@@ -27,7 +27,7 @@ module BigDecimal =
             else
                 trim( number )
         
-        static member private MaxPrecision : bigint = 15I
+        static member private MaxPrecision : bigint = 150I
         static member get_Zero( ) = BigDecimal( 0 )
 
         //Number of zeros after the decimal point
@@ -150,8 +150,75 @@ module BigDecimal =
                 BigDecimal( "0.0" )
         
         member public this.Sqrt( ) =
-            //TODO: implement this
-            BigDecimal( "0.0" )
+            let pairs =
+                //Determines the order in which to pair
+                //VERY important
+                let order = this.Scale % 2I <> 0I
+                let number =
+                    match order with
+                    | true  -> this.Integer.ToString( )
+                    | false -> rev( this.Integer.ToString( ) )
+
+                let rec pair_number( number : string, pairs : String list ) =
+                    if number.Length = 0 then
+                        pairs |> List.rev
+                    else
+                        let pair =
+                            match order with
+                            | true  when number.Length = 1 -> number + "0"
+                            | false when number.Length = 1 -> "0" + number
+                            | true                         -> number.Substring( 0, 2 )
+                            | false                        -> rev( number.Substring( 0, 2 ) )
+                        let number =
+                            match number.Length with
+                            | 1 -> number.Remove( 0, 1 )
+                            | _ -> number.Remove( 0, 2 )
+                        let pairs = pair :: pairs
+                        pair_number( number, pairs )
+                let result = pair_number( number, [] ) |> List.filter( fun x -> x <> "00" )
+
+                match order with
+                | true  -> result
+                | false -> result |> List.rev
+
+            let guess_and_test( c : bigint, p : bigint ) =
+                let rec loop( y : bigint, i : bigint ) =
+                    let y = i * ( ( 20I * p ) + i )
+                    if y <= c then
+                        ( y, i )
+                    else
+                        loop( y, i - 1I )
+                loop( 0I, 9I )
+            
+            let rec sqrt( c : bigint, p : bigint, y : bigint, x : bigint, count : int, digits : String list ) =
+                if bigint( count ) = BigDecimal.MaxPrecision then
+                    let decimal_pos =
+                        let length = this.ToString( ).Length
+                        let pos    = length - int( this.Scale )
+                        match length with
+                        | _ when length < 1 -> -1
+                        | _ when pos % 2 <> 0 -> ( pos / 2 ) + 1
+                        | _ -> pos / 2
+                    digits
+                        |> List.rev
+                        |> List.mapi( fun i x -> if i = decimal_pos then "." + x else x )
+                        |> List.reduce( + )
+                else
+                    let c =
+                        if count < pairs.Length then
+                            if count < 1 then
+                                BigInteger.Parse( pairs.[count] )
+                            else
+                                BigInteger.Parse( ( c - y ).ToString( ) + pairs.[count] )
+                        else
+                            ( c - y ) * 100I
+
+                    let y, x   = guess_and_test( c, p )
+                    let digits = x.ToString( ) :: digits
+                    let p      = BigInteger.Parse( digits |> List.rev |> List.reduce( + ) )
+
+                    sqrt( c, p, y, x, count + 1, digits )
+            BigDecimal( sqrt( 0I, 0I, 0I, 0I, 0, [] ) )
 
         //Comparison
         interface IComparable with
