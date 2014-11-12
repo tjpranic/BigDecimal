@@ -13,8 +13,8 @@ Build project with Visual Studio 2012 or higher and run.
 Future Considerations & Concerns
 -----------
 - Exponentiation still needs implementing
-- Division hasn't been thoroughly tested yet
-- Sqrt needs implementing
+- Division and Sqrt need thorough testing (I think there may be a slight bug in one of them but I am not sure)
+- The long division and square root algorithms are naive digit-by-digit ones which may not perform as well as they should
 
 License
 -----------
