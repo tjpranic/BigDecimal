@@ -11,22 +11,18 @@ module Fraction =
         
         do
             if denominator = bigint 0 then
-                raise( new DivideByZeroException( "Denominator cannot be 0" ) )
+                raise( DivideByZeroException( "Denominator cannot be 0" ) )
 
-        static member get_Zero( ) = Fraction( 0I, 1I )
+        static member Zero = Fraction( 0I, 1I )
+        static member One  = Fraction( 1I, 1I )
 
         member public this.Numerator   = numerator
         member public this.Denominator = denominator
         member public this.Decimal =
             if numerator <> 0I && denominator <> 0I then
-                new BigDecimal( numerator ) / new BigDecimal( denominator )
+                bigdec( numerator ) / bigdec( denominator )
             else
-                new BigDecimal( 0 )
-    
-        member public this.Simplify( ) =
-            let num = this.Numerator   / gcd( this.Numerator, this.Denominator )
-            let den = this.Denominator / gcd( this.Numerator, this.Denominator )
-            Fraction( num, den )
+                bigdec( 0 )
 
         //Fraction and Fraction arithmetic
         static member ( + )( self : Fraction, other : Fraction ) =
@@ -74,7 +70,7 @@ module Fraction =
 
         static member ( / )( self : Fraction, scalar : bigint ) =
             if scalar = 0I then
-                raise( new DivideByZeroException( "Divisor cannot be 0" ) )
+                raise( DivideByZeroException( "Divisor cannot be 0" ) )
             //a / b/c = b/ac
             let num = scalar * self.Denominator
             let den = self.Numerator
@@ -100,7 +96,7 @@ module Fraction =
 
         static member ( / )( scalar : bigint, self : Fraction ) =
             if scalar = 0I then
-                raise( new DivideByZeroException( "Divisor cannot be 0" ) )
+                raise( DivideByZeroException( "Divisor cannot be 0" ) )
             //a / b/c = ac/b
             let num = scalar * self.Denominator
             let den = self.Numerator
@@ -109,9 +105,10 @@ module Fraction =
         //Negation operator
         static member ( ~- )( self : Fraction ) =
             Fraction( -self.Numerator, -self.Denominator )
-
+        
+        //Utility methods
         override this.ToString( ) =
-            if this.Decimal < new BigDecimal( 0 ) then
+            if this.Decimal < BigDecimal.Zero then
                 "-" + ( -this.Numerator ).ToString( ) + "/" + ( -this.Denominator ).ToString( )
             else
                 this.Numerator.ToString( ) + "/" + this.Denominator.ToString( )
@@ -124,3 +121,8 @@ module Fraction =
             this.Decimal.GetHashCode( )
 
         new( ) = Fraction( bigint 1, bigint 1 )
+
+    let reduce( fraction : Fraction ) =
+        let num = fraction.Numerator   / gcd( fraction.Numerator, fraction.Denominator )
+        let den = fraction.Denominator / gcd( fraction.Numerator, fraction.Denominator )
+        Fraction( num, den )

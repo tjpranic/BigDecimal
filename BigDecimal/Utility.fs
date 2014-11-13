@@ -2,7 +2,7 @@
 
 module Utility =
     
-    //Get greatest common divisor of two numbers
+    //Get greatest common divisor of two bigints
     let rec gcd( x : bigint, y : bigint ) =
         if y = 0I then
             x

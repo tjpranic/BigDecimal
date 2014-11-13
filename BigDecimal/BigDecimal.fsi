@@ -1,12 +1,14 @@
 ﻿namespace BigDecimal
 
 open System
-open System.Numerics
 
 module BigDecimal =
-        
+    
     type BigDecimal =
-        static member get_Zero : unit -> BigDecimal
+        static member MaxPrecision : bigint
+
+        static member Zero : BigDecimal
+        static member One  : BigDecimal
 
         static member ( + ) : BigDecimal * BigDecimal -> BigDecimal
         static member ( - ) : BigDecimal * BigDecimal -> BigDecimal
@@ -14,9 +16,6 @@ module BigDecimal =
         static member ( / ) : BigDecimal * BigDecimal -> BigDecimal
 
         static member ( ~- ) : BigDecimal -> BigDecimal
-
-        member Pow  : BigDecimal -> BigDecimal
-        member Sqrt : unit -> BigDecimal
 
         interface IComparable
 
@@ -31,3 +30,8 @@ module BigDecimal =
         new : int64   -> BigDecimal
         new : bigint  -> BigDecimal
         new : unit    -> BigDecimal
+    
+    type bigdec = BigDecimal
+
+    val sqrt : BigDecimal -> BigDecimal
+    val pow  : BigDecimal * BigDecimal -> BigDecimal

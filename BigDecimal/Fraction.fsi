@@ -1,17 +1,16 @@
 ﻿namespace BigDecimal
     
 module Fraction =
-        
+    
     open BigDecimal.BigDecimal
 
     type Fraction =
-        static member get_Zero : unit -> Fraction
+        static member Zero : Fraction
+        static member One  : Fraction
 
         member public Numerator   : bigint
         member public Denominator : bigint
-        member public Decimal     : BigDecimal
-
-        member public Simplify : unit -> Fraction
+        member public Decimal     : bigdec
 
         static member ( + ) : Fraction * Fraction -> Fraction
         static member ( - ) : Fraction * Fraction -> Fraction
@@ -36,3 +35,5 @@ module Fraction =
 
         new : bigint * bigint -> Fraction
         new : unit -> Fraction
+
+    val reduce : Fraction -> Fraction
