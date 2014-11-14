@@ -10,7 +10,6 @@ module Fraction =
 
         member public Numerator   : bigint
         member public Denominator : bigint
-        member public Decimal     : bigdec
 
         static member ( + ) : Fraction * Fraction -> Fraction
         static member ( - ) : Fraction * Fraction -> Fraction
@@ -35,5 +34,6 @@ module Fraction =
 
         new : bigint * bigint -> Fraction
         new : unit -> Fraction
-
-    val reduce : Fraction -> Fraction
+    
+    val reduce      : Fraction -> Fraction
+    val get_decimal : Fraction -> bigdec

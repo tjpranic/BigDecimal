@@ -8,9 +8,9 @@ module Fraction =
     open System
 
     type Fraction( numerator : bigint, denominator : bigint ) =
-        
+
         do
-            if denominator = bigint 0 then
+            if denominator = 0I then
                 raise( DivideByZeroException( "Denominator cannot be 0" ) )
 
         static member Zero = Fraction( 0I, 1I )
@@ -18,11 +18,6 @@ module Fraction =
 
         member public this.Numerator   = numerator
         member public this.Denominator = denominator
-        member public this.Decimal =
-            if numerator <> 0I && denominator <> 0I then
-                bigdec( numerator ) / bigdec( denominator )
-            else
-                bigdec( 0 )
 
         //Fraction and Fraction arithmetic
         static member ( + )( self : Fraction, other : Fraction ) =
@@ -108,21 +103,24 @@ module Fraction =
         
         //Utility methods
         override this.ToString( ) =
-            if this.Decimal < BigDecimal.Zero then
-                "-" + ( -this.Numerator ).ToString( ) + "/" + ( -this.Denominator ).ToString( )
-            else
-                this.Numerator.ToString( ) + "/" + this.Denominator.ToString( )
+            this.Numerator.ToString( ) + "/" + this.Denominator.ToString( )
 
         override this.Equals( other ) =
             let other = other :?> Fraction
             ( this.Numerator = other.Numerator ) && ( this.Denominator = other.Denominator )
 
         override this.GetHashCode( ) =
-            this.Decimal.GetHashCode( )
+            ( this.Numerator.GetHashCode( ) * 17 ) + this.Denominator.GetHashCode( )
 
-        new( ) = Fraction( bigint 1, bigint 1 )
+        new( ) = Fraction( 1I, 1I )
 
     let reduce( fraction : Fraction ) =
         let num = fraction.Numerator   / gcd( fraction.Numerator, fraction.Denominator )
         let den = fraction.Denominator / gcd( fraction.Numerator, fraction.Denominator )
         Fraction( num, den )
+
+    let get_decimal( fraction : Fraction ) =
+        if fraction.Numerator <> 0I && fraction.Denominator <> 0I then
+            bigdec( fraction.Numerator ) / bigdec( fraction.Denominator )
+        else
+            bigdec( 0 )

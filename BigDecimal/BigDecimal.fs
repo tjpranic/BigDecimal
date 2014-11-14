@@ -2,7 +2,6 @@
 
 module BigDecimal =
     
-    open BigDecimal.BigString
     open BigDecimal.Utility
 
     open System
@@ -11,28 +10,25 @@ module BigDecimal =
     let make_string( integer : bigint, scale : bigint ) =
         let s = integer.ToString( )
         if scale <> 0I then
-            if scale > bigint( Int32.MaxValue ) then
-                "[Undisplayable]" //TODO: fix this
-            else
-                let decimal_pos = s.Length - int( scale )
-                //In case the number is supposed to have leading zeros
-                let result =
-                    if decimal_pos < 0 then
-                        let rec adjust_integer( decimal_pos : int, s : string ) =
-                            if decimal_pos = 0 then
-                                ( decimal_pos, s )
-                            else
-                                adjust_integer( decimal_pos + 1, "0" + s )
-                        adjust_integer( decimal_pos, s )
-                    else
-                        ( decimal_pos, s )
+            let decimal_pos = s.Length - int( scale )
+            //In case the number is supposed to have leading zeros
+            let result =
+                if decimal_pos < 0 then
+                    let rec adjust_integer( decimal_pos : int, s : string ) =
+                        if decimal_pos = 0 then
+                            ( decimal_pos, s )
+                        else
+                            adjust_integer( decimal_pos + 1, "0" + s )
+                    adjust_integer( decimal_pos, s )
+                else
+                    ( decimal_pos, s )
 
-                let decimal_pos = fst( result )
-                let s = snd( result )    
+            let decimal_pos = fst( result )
+            let s = snd( result )    
 
-                s.Insert( decimal_pos, match decimal_pos with
-                                       | 0 -> "0."
-                                       | _ -> "." )
+            s.Insert( decimal_pos, match decimal_pos with
+                                    | 0 -> "0."
+                                    | _ -> "." )
         else
             s
 
@@ -47,8 +43,9 @@ module BigDecimal =
                                         |> Array.filter( fun x -> x <> ' ' ) )
 
                 if s.IndexOf( '.' ) <> -1 then
+                    let s = rev( s )
+                    let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
                     let s = new string( s.ToCharArray( )
-                                            |> Array.rev
                                             |> Array.mapi( fun i x -> if x = '0' && i <= pivot then ' ' else x )
                                             |> Array.filter( fun x -> x <> ' ' )
                                             |> Array.rev )
@@ -176,7 +173,8 @@ module BigDecimal =
                     1
                 else
                     let other = obj :?> BigDecimal //Throws InvalidCastException on failure
-                    this.Integer.CompareTo( other.Integer ) //TODO: test this
+                    //NOTE: this is probably incorrect
+                    this.Integer.CompareTo( other.Integer ) 
 
         override this.ToString( ) =
             make_string( this.Integer, this.Scale )
@@ -189,7 +187,7 @@ module BigDecimal =
                 this.Integer = other.Integer && this.Scale = other.Scale
 
         override this.GetHashCode( ) =
-            this.Integer.GetHashCode( )
+            ( this.Integer.GetHashCode( ) * 17 ) + this.Scale.GetHashCode( )
 
         new( num : decimal ) = BigDecimal( num.ToString( ) )
         new( num : double  ) = BigDecimal( num.ToString( ) )
