@@ -103,7 +103,7 @@ module Fraction =
         
         //Utility methods
         override this.ToString( ) =
-            this.Numerator.ToString( ) + "/" + this.Denominator.ToString( )
+            string( this.Numerator ) + "/" + string( this.Denominator )
 
         override this.Equals( other ) =
             let other = other :?> Fraction
@@ -119,7 +119,7 @@ module Fraction =
         let den = fraction.Denominator / gcd( fraction.Numerator, fraction.Denominator )
         Fraction( num, den )
 
-    let get_decimal( fraction : Fraction ) =
+    let to_decimal( fraction : Fraction ) =
         if fraction.Numerator <> 0I && fraction.Denominator <> 0I then
             bigdec( fraction.Numerator ) / bigdec( fraction.Denominator )
         else

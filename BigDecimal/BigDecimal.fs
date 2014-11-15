@@ -8,33 +8,28 @@ module BigDecimal =
     open System.Numerics
 
     let make_string( integer : bigint, scale : bigint ) =
-        let s = integer.ToString( )
+        let s = string( integer )
         if scale <> 0I then
             let decimal_pos = s.Length - int( scale )
-            //In case the number is supposed to have leading zeros
             let result =
                 if decimal_pos < 0 then
-                    let rec adjust_integer( decimal_pos : int, s : string ) =
-                        if decimal_pos = 0 then
-                            ( decimal_pos, s )
-                        else
-                            adjust_integer( decimal_pos + 1, "0" + s )
-                    adjust_integer( decimal_pos, s )
+                    //In case the number is supposed to have leading zeros
+                    ( 0, ( [ for i in 0..abs( decimal_pos ) - 1 do yield "0" ] |> List.reduce( + ) ) + s )
                 else
                     ( decimal_pos, s )
 
             let decimal_pos = fst( result )
-            let s = snd( result )    
+            let s = snd( result )
 
             s.Insert( decimal_pos, match decimal_pos with
-                                    | 0 -> "0."
-                                    | _ -> "." )
+                                   | 0 -> "0."
+                                   | _ -> "." )
         else
             s
 
     type BigDecimal( number : string ) =
 
-        //Trim the number
+        //Trim the number of unnecessary zeros
         let number =
             let trim( s : string ) =
                 let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
@@ -75,10 +70,10 @@ module BigDecimal =
                     raise( FormatException( "Multiple decimal points in input string" ) )
 
                 let index = number.IndexOf( '.' )
-                if index > 0 then
-                    number.Remove( index, 1 )
-                else
+                if index = -1 then
                     number
+                else
+                    number.Remove( index, 1 )
 
             let result = number_sans_point |> BigInteger.TryParse
 
@@ -150,7 +145,7 @@ module BigDecimal =
                             else
                                 dividend
                     
-                        let decimals = quotient.ToString( ) :: decimals
+                        let decimals = string( quotient ) :: decimals
 
                         long_divide( quotient, remainder, dividend, decimals )
                     else
@@ -189,12 +184,12 @@ module BigDecimal =
         override this.GetHashCode( ) =
             ( this.Integer.GetHashCode( ) * 17 ) + this.Scale.GetHashCode( )
 
-        new( num : decimal ) = BigDecimal( num.ToString( ) )
-        new( num : double  ) = BigDecimal( num.ToString( ) )
-        new( num : int32   ) = BigDecimal( num.ToString( ) )
-        new( num : int64   ) = BigDecimal( num.ToString( ) )
-        new( num : bigint  ) = BigDecimal( num.ToString( ) )
-        new( ) = BigDecimal( "0.0" )
+        new( num : decimal ) = BigDecimal( string( num ) )
+        new( num : double  ) = BigDecimal( string( num ) )
+        new( num : int32   ) = BigDecimal( string( num ) )
+        new( num : int64   ) = BigDecimal( string( num ) )
+        new( num : bigint  ) = BigDecimal( string( num ) )
+        new( ) = BigDecimal( "0" )
     
     type bigdec = BigDecimal
 
@@ -205,8 +200,8 @@ module BigDecimal =
             let order = number.Scale % 2I <> 0I
             let number =
                 match order with
-                | true  -> number.Integer.ToString( )
-                | false -> rev( number.Integer.ToString( ) )
+                | true  -> string( number.Integer )
+                | false -> rev( string( number.Integer ) )
 
             let rec pair_number( number : string, pairs : String list ) =
                 if number.Length = 0 then
@@ -243,7 +238,7 @@ module BigDecimal =
         let rec sqrt( c : bigint, p : bigint, y : bigint, x : bigint, count : int, digits : String list ) =
             if bigint( count ) = BigDecimal.MaxPrecision then
                 let decimal_pos =
-                    let length = number.ToString( ).Length
+                    let length = string( number ).Length
                     let pos    = length - int( number.Scale )
                     match length with
                     | _ when length < 1 -> -1
@@ -259,12 +254,12 @@ module BigDecimal =
                         if count < 1 then
                             BigInteger.Parse( pairs.[count] )
                         else
-                            BigInteger.Parse( ( c - y ).ToString( ) + pairs.[count] )
+                            BigInteger.Parse( string( c - y ) + pairs.[count] )
                     else
                         ( c - y ) * 100I
 
                 let y, x   = guess_and_test( c, p )
-                let digits = x.ToString( ) :: digits
+                let digits = string( x ) :: digits
                 let p      = BigInteger.Parse( digits |> List.rev |> List.reduce( + ) )
 
                 sqrt( c, p, y, x, count + 1, digits )
@@ -275,8 +270,8 @@ module BigDecimal =
             if power.Integer >= 0I then
                 BigDecimal( pow( number.Integer, power.Integer ) )
             else
-                ( new BigDecimal( "1.0" ) ) / ( new BigDecimal( pow( number.Integer, abs( power.Integer ) ) ) )
+                BigDecimal.One / BigDecimal( pow( number.Integer, abs( power.Integer ) ) )
         else
             //TODO: implement this
             //convert to power to fraction then x ^ a/b = bth root of x ^ a
-            BigDecimal( "0.0" )
+            BigDecimal.Zero

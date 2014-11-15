@@ -35,5 +35,5 @@ module Fraction =
         new : bigint * bigint -> Fraction
         new : unit -> Fraction
     
-    val reduce      : Fraction -> Fraction
-    val get_decimal : Fraction -> bigdec
+    val reduce     : Fraction -> Fraction
+    val to_decimal : Fraction -> bigdec
