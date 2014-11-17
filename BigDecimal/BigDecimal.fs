@@ -21,9 +21,8 @@ module BigDecimal =
             let decimal_pos = fst( result )
             let s = snd( result )
 
-            s.Insert( decimal_pos, match decimal_pos with
-                                   | 0 -> "0."
-                                   | _ -> "." )
+            let decimal_notation = if decimal_pos = 0 then "0." else "."
+            s.Insert( decimal_pos, decimal_notation )
         else
             s
 
@@ -203,9 +202,10 @@ module BigDecimal =
             //VERY important
             let order = number.Scale % 2I <> 0I
             let number =
-                match order with
-                | true  -> string( number.Integer )
-                | false -> rev( string( number.Integer ) )
+                if order then
+                    string( number.Integer )
+                else
+                    rev( string( number.Integer ) )
 
             let rec pair_number( number : string, pairs : String list ) =
                 if number.Length = 0 then
@@ -218,16 +218,18 @@ module BigDecimal =
                         | true                         -> number.Substring( 0, 2 )
                         | false                        -> rev( number.Substring( 0, 2 ) )
                     let number =
-                        match number.Length with
-                        | 1 -> number.Remove( 0, 1 )
-                        | _ -> number.Remove( 0, 2 )
+                        if number.Length = 1 then
+                            number.Remove( 0, 1 )
+                        else
+                            number.Remove( 0, 2 )
                     let pairs = pair :: pairs
                     pair_number( number, pairs )
             let result = pair_number( number, [] ) |> List.filter( fun x -> x <> "00" )
 
-            match order with
-            | true  -> result
-            | false -> result |> List.rev
+            if order then
+                result
+            else
+                result |> List.rev
 
         let guess_and_test( c : bigint, p : bigint ) =
             let rec loop( y : bigint, i : bigint ) =
