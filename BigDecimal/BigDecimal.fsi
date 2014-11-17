@@ -35,3 +35,9 @@ module BigDecimal =
 
     val sqrt : BigDecimal -> BigDecimal
     val pow  : BigDecimal * BigDecimal -> BigDecimal
+
+    module NumericLiteralZ =
+        val FromZero  : unit  -> BigDecimal
+        val FromOne   : unit  -> BigDecimal
+        val FromInt32 : int32 -> BigDecimal
+        val FromInt64 : int64 -> BigDecimal

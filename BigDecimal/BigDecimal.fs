@@ -9,7 +9,7 @@ module BigDecimal =
 
     let make_string( integer : bigint, scale : bigint ) =
         let s = string( integer )
-        if scale <> 0I then
+        if scale > 0I then
             let decimal_pos = s.Length - int( scale )
             let result =
                 if decimal_pos < 0 then
@@ -32,23 +32,27 @@ module BigDecimal =
         //Trim the number of unnecessary zeros
         let number =
             let trim( s : string ) =
+                //Trim the front
                 let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
                 let s = new string( s.ToCharArray( )
                                         |> Array.mapi( fun i x -> if x = '0' && i < pivot && s.[i + 1] <> '.' then ' ' else x )
                                         |> Array.filter( fun x -> x <> ' ' ) )
 
                 if s.IndexOf( '.' ) <> -1 then
+                    //Trim the back if necessary
                     let s = rev( s )
                     let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
                     let s = new string( s.ToCharArray( )
                                             |> Array.mapi( fun i x -> if x = '0' && i <= pivot then ' ' else x )
                                             |> Array.filter( fun x -> x <> ' ' )
                                             |> Array.rev )
+                    //Remove decimal point if necessary
                     if s.[s.Length - 1] = '.' then s.Remove( s.IndexOf( '.' ) ) else s
                 else
                     s
             trim( number )
-
+        
+        //TODO: add ability to change decimal precision
         static member MaxPrecision = 50I
 
         static member Zero = BigDecimal( 0 )
@@ -164,13 +168,13 @@ module BigDecimal =
         //Utility methods
         interface IComparable with
             member this.CompareTo( obj ) =
-                if obj = null then
-                    1
-                else
-                    let other = obj :?> BigDecimal //Throws InvalidCastException on failure
-                    //NOTE: this is probably incorrect
-                    this.Integer.CompareTo( other.Integer ) 
-
+                let other = obj :?> BigDecimal //Throws InvalidCastException on failure
+                match this with
+                | _ when this.Integer = other.Integer        -> -( this.Scale.CompareTo( other.Scale ) )
+                | _ when this.Scale = other.Scale            ->  this.Integer.CompareTo( other.Integer )
+                | _ when this.Scale = 0I || other.Scale = 0I ->  this.Integer.CompareTo( other.Integer ) //Special case
+                | _                                          -> -( this.Scale.CompareTo( other.Scale ) )
+        
         override this.ToString( ) =
             make_string( this.Integer, this.Scale )
     
@@ -266,12 +270,18 @@ module BigDecimal =
         BigDecimal( sqrt( 0I, 0I, 0I, 0I, 0, [] ) )
 
     let pow( number : BigDecimal, power : BigDecimal ) =
-        if number.Scale = 0I && power.Scale = 0I then
-            if power.Integer >= 0I then
-                BigDecimal( pow( number.Integer, power.Integer ) )
-            else
-                BigDecimal.One / BigDecimal( pow( number.Integer, abs( power.Integer ) ) )
-        else
-            //TODO: implement this
-            //convert to power to fraction then x ^ a/b = bth root of x ^ a
-            BigDecimal.Zero
+        match power.Integer >= 0I with
+        | true  when number.Scale = 0I && power.Scale = 0I -> BigDecimal( pow( number.Integer, power.Integer ) )
+        | false when number.Scale = 0I && power.Scale = 0I -> BigDecimal.One / BigDecimal( pow( number.Integer, abs( power.Integer ) ) )
+        | true  when number.Scale > 0I -> BigDecimal( make_string( pow( number.Integer, power.Integer ), number.Scale * power.Integer ) )
+        | false when number.Scale > 0I -> BigDecimal.One / BigDecimal( make_string( pow( number.Integer, abs( power.Integer ) ), number.Scale * abs( power.Integer ) ) )
+        | _ -> //TODO: implement this
+               //convert to power to fraction then x ^ a/b = bth root of x ^ a
+               BigDecimal.Zero
+
+    //There are only custom literals for integers according to the F# 3.0 spec
+    module NumericLiteralZ =
+        let FromZero( )    = BigDecimal.Zero
+        let FromOne( )     = BigDecimal.One
+        let FromInt32( n ) = BigDecimal( n : int32 )
+        let FromInt64( n ) = BigDecimal( n : int64 )
