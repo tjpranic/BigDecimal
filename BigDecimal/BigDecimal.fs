@@ -277,13 +277,9 @@ module BigDecimal =
         | false when number.Scale = 0I && power.Scale = 0I -> BigDecimal.One / BigDecimal( pow( number.Integer, abs( power.Integer ) ) )
         | true  when number.Scale > 0I -> BigDecimal( make_string( pow( number.Integer, power.Integer ), number.Scale * power.Integer ) )
         | false when number.Scale > 0I -> BigDecimal.One / BigDecimal( make_string( pow( number.Integer, abs( power.Integer ) ), number.Scale * abs( power.Integer ) ) )
-        | _ -> //TODO: implement this
-               //convert to power to fraction then x ^ a/b = bth root of x ^ a
-               BigDecimal.Zero
-
-    //There are only custom literals for integers according to the F# 3.0 spec
-    module NumericLiteralZ =
-        let FromZero( )    = BigDecimal.Zero
-        let FromOne( )     = BigDecimal.One
-        let FromInt32( n ) = BigDecimal( n : int32 )
-        let FromInt64( n ) = BigDecimal( n : int64 )
+        | true  when number.Scale = 0I && power.Scale > 0I -> BigDecimal.Zero //TODO: implement these
+        | false when number.Scale = 0I && power.Scale > 0I -> BigDecimal.Zero //
+        | true  when number.Scale > 0I && power.Scale > 0I -> BigDecimal.Zero //
+        | false when number.Scale > 0I && power.Scale > 0I -> BigDecimal.Zero //
+        | _ -> BigDecimal.Zero //NOTE: should not get here
+               
