@@ -198,38 +198,33 @@ module BigDecimal =
 
     let sqrt( number : BigDecimal ) =
         let pairs =
-            //Determines the order in which to pair
-            //VERY important
-            let order = number.Scale % 2I <> 0I
-            let number =
-                if order then
-                    string( number.Integer )
-                else
-                    rev( string( number.Integer ) )
+            let rev_needed = number.Scale % 2I <> 0I
 
-            let rec pair_number( number : string, pairs : String list ) =
+            let number_as_string =
+                if rev_needed then
+                    number.Integer.ToString( )
+                else
+                    rev( number.Integer.ToString( ) )
+
+            let rec pair_number( number : string, pairs : string list ) =
                 if number.Length = 0 then
                     pairs |> List.rev
+                else if number.Length = 1 then
+                    let pair   = number + "0"
+                    let number = number.Remove( 0, 1 )
+                    let pairs  = pair :: pairs
+                    pairs |> List.rev
                 else
-                    let pair =
-                        match order with
-                        | true  when number.Length = 1 -> number + "0"
-                        | false when number.Length = 1 -> "0" + number
-                        | true                         -> number.Substring( 0, 2 )
-                        | false                        -> rev( number.Substring( 0, 2 ) )
-                    let number =
-                        if number.Length = 1 then
-                            number.Remove( 0, 1 )
-                        else
-                            number.Remove( 0, 2 )
-                    let pairs = pair :: pairs
+                    let pair   = number.Substring( 0, 2 )
+                    let number = number.Remove( 0, 2 )
+                    let pairs  = pair :: pairs
                     pair_number( number, pairs )
-            let result = pair_number( number, [] ) |> List.filter( fun x -> x <> "00" )
-
-            if order then
-                result
-            else
-                result |> List.rev
+            let result = pair_number( number_as_string, [] ) |> List.filter( fun x -> x <> "00" )
+            
+            if rev_needed then
+                    result
+                else
+                    result |> List.rev |> List.map( fun x -> rev( x ) )
 
         let guess_and_test( c : bigint, p : bigint ) =
             let rec loop( y : bigint, i : bigint ) =
@@ -241,8 +236,9 @@ module BigDecimal =
             loop( 0I, 9I )
             
         //SQUARE ROOT
-        let rec sqrt( c : bigint, p : bigint, y : bigint, x : bigint, count : int, digits : String list ) =
+        let rec sqrt( c : bigint, p : bigint, y : bigint, x : bigint, count : int, digits : string list ) =
             if bigint( count ) = BigDecimal.MaxPrecision then
+                //NOTE: There is a bug in here when sqrt( 1122.33445 )
                 let decimal_pos =
                     let length = string( number ).Length
                     let pos    = length - int( number.Scale )
@@ -271,15 +267,9 @@ module BigDecimal =
                 sqrt( c, p, y, x, count + 1, digits )
         BigDecimal( sqrt( 0I, 0I, 0I, 0I, 0, [] ) )
 
-    let pow( number : BigDecimal, power : BigDecimal ) =
-        match power.Integer >= 0I with
-        | true  when number.Scale = 0I && power.Scale = 0I -> BigDecimal( pow( number.Integer, power.Integer ) )
-        | false when number.Scale = 0I && power.Scale = 0I -> BigDecimal.One / BigDecimal( pow( number.Integer, abs( power.Integer ) ) )
-        | true  when number.Scale > 0I -> BigDecimal( make_string( pow( number.Integer, power.Integer ), number.Scale * power.Integer ) )
-        | false when number.Scale > 0I -> BigDecimal.One / BigDecimal( make_string( pow( number.Integer, abs( power.Integer ) ), number.Scale * abs( power.Integer ) ) )
-        | true  when number.Scale = 0I && power.Scale > 0I -> BigDecimal.Zero //TODO: implement these
-        | false when number.Scale = 0I && power.Scale > 0I -> BigDecimal.Zero //
-        | true  when number.Scale > 0I && power.Scale > 0I -> BigDecimal.Zero //
-        | false when number.Scale > 0I && power.Scale > 0I -> BigDecimal.Zero //
-        | _ -> BigDecimal.Zero //NOTE: should not get here
+    let pow( number : BigDecimal, power : bigint ) =
+        if power > 0I then
+            BigDecimal( pow( number.Integer, power ) )
+        else
+            BigDecimal.One / BigDecimal( pow( number.Integer, abs( power ) ) )
                

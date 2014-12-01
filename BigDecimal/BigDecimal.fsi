@@ -34,4 +34,4 @@ module BigDecimal =
     type bigdec = BigDecimal
 
     val sqrt : BigDecimal -> BigDecimal
-    val pow  : BigDecimal * BigDecimal -> BigDecimal
+    val pow  : BigDecimal * bigint -> BigDecimal
