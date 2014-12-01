@@ -11,7 +11,7 @@ open BigDecimal.Utility
 // 1 / ( (sqrt(8) / 9801) * sum ((4n)! / (n!)^4) * ((26390n + 1103) / 396^(4n)) n=0 to 5 )
 let pi_ramanujan( iterations : int ) =
     let reciprocal_pi =
-        let first_terms = sqrt( 8Z ) / 9801Z
+        let first_terms = sqrt( bigdec( 8 ) ) / bigdec( 9801 )
 
         let second_terms( iterations : int ) =
             let sum_term_one( n : bigint ) =
@@ -25,10 +25,10 @@ let pi_ramanujan( iterations : int ) =
                                                   sum_term_two( bigint( k ) ) ]
                 |> List.sum )
 
-        ( first_terms * 1103Z ) +                    //when n = 0
+        ( first_terms * bigdec( 1103 ) ) +           //when n = 0
         ( first_terms * second_terms( iterations ) ) //when n > 0
 
-    1Z / reciprocal_pi
+    bigdec( 1 ) / reciprocal_pi
 
 [<EntryPoint>]
 let main argv =
