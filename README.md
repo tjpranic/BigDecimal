@@ -13,7 +13,6 @@ Build project with Visual Studio 2012 or higher and run.
 Future Considerations & Concerns
 -----------
 - Everything needs thorough testing.
-- Performance was not taken into account during development
 - The algorithms used are simple, naive algorithms which may not have the best performance
 
 License
