@@ -238,14 +238,13 @@ module BigDecimal =
         //SQUARE ROOT
         let rec sqrt( c : bigint, p : bigint, y : bigint, x : bigint, count : int, digits : string list ) =
             if bigint( count ) = BigDecimal.MaxPrecision then
-                //NOTE: There is a bug in here when sqrt( 1122.33445 )
                 let decimal_pos =
-                    let length = string( number ).Length
+                    let length = number.Integer.ToString( ).Length
                     let pos    = length - int( number.Scale )
                     match length with
-                    | _ when length < 1 -> -1
+                    | _ when length < 1   -> -1
                     | _ when pos % 2 <> 0 -> ( pos / 2 ) + 1
-                    | _ -> pos / 2
+                    | _                   -> pos / 2
                 digits
                     |> List.rev
                     |> List.mapi( fun i x -> if i = decimal_pos then "." + x else x )
