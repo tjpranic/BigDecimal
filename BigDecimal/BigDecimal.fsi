@@ -5,7 +5,7 @@ open System
 module BigDecimal =
     
     type BigDecimal =
-        static member MaxPrecision : bigint
+        static member MaxPrecision : bigint with get, set
 
         static member Zero : BigDecimal
         static member One  : BigDecimal

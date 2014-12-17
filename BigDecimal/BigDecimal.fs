@@ -51,8 +51,10 @@ module BigDecimal =
                     s
             trim( number )
         
-        //TODO: add ability to change decimal precision
-        static member MaxPrecision = 50I
+        static let mutable precision = 50I
+        static member MaxPrecision
+            with get( )   = precision
+            and  set( v ) = precision <- v
 
         static member Zero = BigDecimal( 0 )
         static member One  = BigDecimal( 1 )
@@ -271,4 +273,3 @@ module BigDecimal =
             BigDecimal( pow( number.Integer, power ) )
         else
             BigDecimal.One / BigDecimal( pow( number.Integer, abs( power ) ) )
-               
