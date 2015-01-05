@@ -50,7 +50,7 @@ module BigDecimal =
                 else
                     s
             trim( number )
-        
+
         static let mutable precision = 50I
         static member MaxPrecision
             with get( )   = precision
@@ -161,7 +161,16 @@ module BigDecimal =
                 BigDecimal( long_divide( quotient, remainder, readjusted_dividend, [] ) )
             else
                 BigDecimal( quotient )
-    
+       
+        static member Pow( self : BigDecimal, power : bigint ) =
+            if power > 0I then
+                BigDecimal( pow( self.Integer, power ) )
+            else
+                BigDecimal.One / BigDecimal( pow( self.Integer, abs( power ) ) )
+
+        static member ( ** )( self : BigDecimal, power : bigint ) =
+            BigDecimal.Pow( self, power )
+
         //Negation
         static member ( ~- )( self : BigDecimal ) =
             BigDecimal( make_string( -self.Integer, self.Scale ) : string )
@@ -197,6 +206,9 @@ module BigDecimal =
         new( ) = BigDecimal( "0" )
     
     type bigdec = BigDecimal
+
+    let pow( number : BigDecimal, power : bigint ) =
+        BigDecimal.Pow( number, power )
 
     let sqrt( number : BigDecimal ) =
         let pairs =
@@ -267,9 +279,35 @@ module BigDecimal =
 
                 sqrt( c, p, y, x, count + 1, digits )
         BigDecimal( sqrt( 0I, 0I, 0I, 0I, 0, [] ) )
+    
+    let is_decimal( number : BigDecimal ) =
+        number.Scale > 0I
 
-    let pow( number : BigDecimal, power : bigint ) =
-        if power > 0I then
-            BigDecimal( pow( number.Integer, power ) )
+    let is_whole( number : BigDecimal ) =
+        not( is_decimal( number ) )
+
+    let to_bigint( number : BigDecimal ) =
+        let string_rep = number.ToString( )
+        let index = string_rep.IndexOf( '.' )
+        if index <> 0 then
+            BigInteger.Parse( string_rep.Substring( 0, string_rep.Length - index ) )
         else
-            BigDecimal.One / BigDecimal( pow( number.Integer, abs( power ) ) )
+            number.Integer
+
+    let floor( number : BigDecimal ) =
+        BigDecimal( to_bigint( number ) )
+
+    let ceiling( number : BigDecimal ) =
+        BigDecimal( to_bigint( number ) ) + BigDecimal.One
+
+    let round( number : BigDecimal ) =
+        let string_rep = number.ToString( )
+        let index = string_rep.IndexOf( '.' )
+        if index <> 0 then
+            let deteriminant = Int32.Parse( string_rep.[index + 1].ToString( ) )
+            if deteriminant < 5 then
+                floor( number )
+            else
+                ceiling( number )
+        else
+            number

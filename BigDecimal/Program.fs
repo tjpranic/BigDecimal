@@ -32,6 +32,9 @@ let pi_ramanujan( iterations : int ) =
 
 [<EntryPoint>]
 let main argv =
-    printfn "%A" ( pi_ramanujan( 15 ) )
+    try
+        printfn "%A" ( pi_ramanujan( 15 ) )
+    with
+    | ex -> printfn "%A\n\n%A" ex.Message ex.StackTrace
 
     0
