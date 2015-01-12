@@ -25,33 +25,136 @@ module BigDecimal =
             s.Insert( decimal_pos, decimal_notation )
         else
             s
+    
+    //This is up here because the Pow operator depends on the nth_root function
+    let shifting_nth_root( root : int, integer : bigint, scale : bigint, precision : int ) =
+        let number = make_string( integer, scale )
+        let group_number( group_size : int, number : string ) =
+            let index      = number.IndexOf( '.' )
+            let zeroes_req = index % root <> 0
+            let number     = number.Remove( int( index ), 1 )
+
+            //Add leading zeros if necessary
+            let prefix =
+                if zeroes_req then
+                    ( [ for i in 0..( root - index % root ) - 1 do yield "0" ] |> List.reduce( + ) )
+                else
+                    ""
+            let number = prefix + number
+
+            let groups =
+                let temp =
+                    let rec group_loop( number : string, groups : String list ) =
+                        if number.Length > 0 then
+                            let temp_group =
+                                if number.Length < int( root ) then
+                                    number
+                                else
+                                    number.Substring( 0, ( int( root ) ) )
+                            let number =
+                                if root < number.Length then
+                                    number.Substring( int( root ) )
+                                else
+                                    ""
+                            let groups = temp_group :: groups
+                            group_loop( number, groups )
+                        else
+                            groups |> List.rev
+                    group_loop( number, [] )
+
+                //Add trailing zeros if necessary
+                let last = temp.[temp.Length - 1]
+                if last.Length <> root then
+                    let suffix = ( [ for i in 0..( root - last.Length ) - 1 do yield "0" ] |> List.reduce( + ) )
+                    temp |> List.mapi( fun i x -> if i = ( temp.Length - 1 ) then x + suffix else x )
+                else
+                    temp
+            
+            //Remove groups of all zeroes
+            groups |> List.filter( fun x -> int( x ) <> 0 )
+
+        let rec nth_root( groups : String list, digits : String list, x : bigint, y : bigint, r : bigint, alpha : bigint, beta : int, x2 : bigint, y2 : bigint, r2 : bigint, count : int ) =
+            if count < precision then
+                let alpha =
+                    if count < groups.Length then
+                        BigInteger.Parse( groups.[count] )
+                    else
+                        0I
+
+                let numeric_base = 10I
+
+                let guess_and_test( ) =
+                    let rec loop( count : int ) =
+                        let beta = count
+                        if ( ( ( numeric_base * y ) + bigint( beta ) ) ** root ) <= ( ( numeric_base ** root ) * x ) + alpha then
+                            beta
+                        else
+                            loop( count - 1 )
+                    loop( 9 )
+                let beta = guess_and_test( )
+
+                let x2 = ( ( numeric_base ** root ) * x ) + alpha
+                let y2 = ( numeric_base * y ) + bigint( beta )
+                let r2 = x2 - ( y2 ** root )
+
+                let x, y, r = x2, y2, r2
+
+                let digits = beta.ToString( ) :: digits
+
+                nth_root( groups, digits, x, y, r, alpha, beta, x2, y2, r2, count + 1 )
+            else
+                digits |> List.rev
+
+        let groups = group_number( root, number )
+        let digits = nth_root( groups, [], 0I, 0I, 0I, 0I, 0, 0I, 0I, 0I, 0 )
+
+        let index = number.IndexOf( '.' )
+        let pos =
+            if index <> -1 then
+                if index % root <> 0 then
+                    ( index / root ) + 1
+                else
+                    ( index / root )
+            else
+                -1
+
+        digits
+            |> List.mapi( fun i x -> if i = pos then "." + x else x ) //Add decimal point if necessary
+            |> List.reduce( + )
 
     type BigDecimal( number : string ) =
-
+        
         //Trim the number of unnecessary zeros
         let number =
             let trim( s : string ) =
+                let s =
+                    let index = s.IndexOf( '.' )
+                    if index = -1 then
+                        s + ".0"
+                    else
+                        s
+                
                 //Trim the front
                 let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
                 let s = new string( s.ToCharArray( )
                                         |> Array.mapi( fun i x -> if x = '0' && i < pivot && s.[i + 1] <> '.' then ' ' else x )
                                         |> Array.filter( fun x -> x <> ' ' ) )
 
-                if s.IndexOf( '.' ) <> -1 then
-                    //Trim the back if necessary
-                    let s = rev( s )
-                    let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
-                    let s = new string( s.ToCharArray( )
-                                            |> Array.mapi( fun i x -> if x = '0' && i <= pivot then ' ' else x )
-                                            |> Array.filter( fun x -> x <> ' ' )
-                                            |> Array.rev )
-                    //Remove decimal point if necessary
-                    if s.[s.Length - 1] = '.' then s.Remove( s.IndexOf( '.' ) ) else s
-                else
-                    s
+                //Trim the back
+                let s = rev( s )
+                let pivot =
+                    let temp = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
+                    if temp = s.IndexOf( '.' ) then
+                        temp - 1
+                    else
+                        temp
+                new string( s.ToCharArray( )
+                                |> Array.mapi( fun i x -> if x = '0' && i < pivot then ' ' else x )
+                                |> Array.filter( fun x -> x <> ' ' )
+                                |> Array.rev )
             trim( number )
 
-        static let mutable precision = 50I
+        static let mutable precision = 50
         static member MaxPrecision
             with get( )   = precision
             and  set( v ) = precision <- v
@@ -139,7 +242,7 @@ module BigDecimal =
             if remainder > 0I then
                 let divisor = readjusted_divisor
                 let rec long_divide( quotient : bigint, remainder : bigint, dividend : bigint, decimals : string list ) =
-                    if remainder <> 0I && bigint( decimals.Length ) <= BigDecimal.MaxPrecision then
+                    if remainder <> 0I && bigint( decimals.Length ) <= bigint( BigDecimal.MaxPrecision ) then
                         let result    = BigInteger.DivRem( dividend, divisor )
                         let quotient  = fst( result )
                         let remainder = snd( result )
@@ -162,13 +265,23 @@ module BigDecimal =
             else
                 BigDecimal( quotient )
        
-        static member Pow( self : BigDecimal, power : bigint ) =
-            if power > 0I then
-                BigDecimal( pow( self.Integer, power ) )
+        static member Pow( self : BigDecimal, power : BigDecimal ) =
+            //TODO
+            if self.Scale = 0I && power.Scale = 0I then
+                if power.Integer > 0I then
+                    BigDecimal( pow( self.Integer, power.Integer ) )
+                else
+                    BigDecimal.One / BigDecimal( pow( self.Integer, abs( power.Integer ) ) )
             else
-                BigDecimal.One / BigDecimal( pow( self.Integer, abs( power ) ) )
+                BigDecimal.Zero
 
-        static member ( ** )( self : BigDecimal, power : bigint ) =
+        static member Abs( self : BigDecimal ) =
+            if self < BigDecimal.Zero then
+                -self
+            else
+                self
+
+        static member ( ** )( self : BigDecimal, power : BigDecimal ) =
             BigDecimal.Pow( self, power )
 
         //Negation
@@ -207,79 +320,21 @@ module BigDecimal =
     
     type bigdec = BigDecimal
 
-    let pow( number : BigDecimal, power : bigint ) =
+    let pow( number : BigDecimal, power : BigDecimal ) =
         BigDecimal.Pow( number, power )
 
+    let abs( number : BigDecimal ) =
+        BigDecimal.Abs( number )
+
+    let nth_root( root : int, number : BigDecimal ) =
+        BigDecimal( shifting_nth_root( root, number.Integer, number.Scale, BigDecimal.MaxPrecision ) )
+
     let sqrt( number : BigDecimal ) =
-        let pairs =
-            let rev_needed = number.Scale % 2I <> 0I
+        nth_root( 2, number )
 
-            let number_as_string =
-                if rev_needed then
-                    number.Integer.ToString( )
-                else
-                    rev( number.Integer.ToString( ) )
+    let cbrt( number : BigDecimal ) =
+        nth_root( 3, number )
 
-            let rec pair_number( number : string, pairs : string list ) =
-                if number.Length = 0 then
-                    pairs |> List.rev
-                else if number.Length = 1 then
-                    let pair   = number + "0"
-                    let number = number.Remove( 0, 1 )
-                    let pairs  = pair :: pairs
-                    pairs |> List.rev
-                else
-                    let pair   = number.Substring( 0, 2 )
-                    let number = number.Remove( 0, 2 )
-                    let pairs  = pair :: pairs
-                    pair_number( number, pairs )
-            let result = pair_number( number_as_string, [] ) |> List.filter( fun x -> x <> "00" )
-            
-            if rev_needed then
-                    result
-                else
-                    result |> List.rev |> List.map( fun x -> rev( x ) )
-
-        let guess_and_test( c : bigint, p : bigint ) =
-            let rec loop( y : bigint, i : bigint ) =
-                let y = i * ( ( 20I * p ) + i )
-                if y <= c then
-                    ( y, i )
-                else
-                    loop( y, i - 1I )
-            loop( 0I, 9I )
-            
-        //SQUARE ROOT
-        let rec sqrt( c : bigint, p : bigint, y : bigint, x : bigint, count : int, digits : string list ) =
-            if bigint( count ) = BigDecimal.MaxPrecision then
-                let decimal_pos =
-                    let length = number.Integer.ToString( ).Length
-                    let pos    = length - int( number.Scale )
-                    match length with
-                    | _ when length < 1   -> -1
-                    | _ when pos % 2 <> 0 -> ( pos / 2 ) + 1
-                    | _                   -> pos / 2
-                digits
-                    |> List.rev
-                    |> List.mapi( fun i x -> if i = decimal_pos then "." + x else x )
-                    |> List.reduce( + )
-            else
-                let c =
-                    if count < pairs.Length then
-                        if count < 1 then
-                            BigInteger.Parse( pairs.[count] )
-                        else
-                            BigInteger.Parse( string( c - y ) + pairs.[count] )
-                    else
-                        ( c - y ) * 100I
-
-                let y, x   = guess_and_test( c, p )
-                let digits = string( x ) :: digits
-                let p      = BigInteger.Parse( digits |> List.rev |> List.reduce( + ) )
-
-                sqrt( c, p, y, x, count + 1, digits )
-        BigDecimal( sqrt( 0I, 0I, 0I, 0I, 0, [] ) )
-    
     let is_decimal( number : BigDecimal ) =
         number.Scale > 0I
 
