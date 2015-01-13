@@ -46,18 +46,13 @@ module BigDecimal =
                 let temp =
                     let rec group_loop( number : string, groups : String list ) =
                         if number.Length > 0 then
-                            let temp_group =
-                                if number.Length < int( root ) then
-                                    number
-                                else
-                                    number.Substring( 0, ( int( root ) ) )
-                            let number =
+                            let group_and_number =
                                 if root < number.Length then
-                                    number.Substring( int( root ) )
+                                    ( number.Substring( 0, root ), number.Substring( root ) )
                                 else
-                                    ""
-                            let groups = temp_group :: groups
-                            group_loop( number, groups )
+                                    ( number, "" )
+                            let groups = fst( group_and_number ) :: groups
+                            group_loop( snd( group_and_number ), groups )
                         else
                             groups |> List.rev
                     group_loop( number, [] )
@@ -83,15 +78,11 @@ module BigDecimal =
 
                 let numeric_base = 10I
 
-                let guess_and_test( ) =
-                    let rec loop( count : int ) =
-                        let beta = count
-                        if ( ( ( numeric_base * y ) + bigint( beta ) ) ** root ) <= ( ( numeric_base ** root ) * x ) + alpha then
-                            beta
-                        else
-                            loop( count - 1 )
-                    loop( 9 )
-                let beta = guess_and_test( )
+                let beta =
+                    [ for i in 0..9 do yield i ]
+                        |> List.rev
+                        |> List.filter( fun beta -> ( ( ( numeric_base * y ) + bigint( beta ) ) ** root ) <= ( ( numeric_base ** root ) * x ) + alpha )
+                        |> List.head
 
                 let x2 = ( ( numeric_base ** root ) * x ) + alpha
                 let y2 = ( numeric_base * y ) + bigint( beta )
@@ -266,13 +257,19 @@ module BigDecimal =
                 BigDecimal( quotient )
        
         static member Pow( self : BigDecimal, power : BigDecimal ) =
-            //TODO
             if self.Scale = 0I && power.Scale = 0I then
                 if power.Integer > 0I then
                     BigDecimal( pow( self.Integer, power.Integer ) )
                 else
                     BigDecimal.One / BigDecimal( pow( self.Integer, abs( power.Integer ) ) )
-            else
+            else if self.Scale > 0I && power.Scale = 0I then
+                
+                BigDecimal.Zero
+            else if self.Scale = 0I && power.Scale > 0I then
+                
+                BigDecimal.Zero
+            else //self.Scale > 0I && power.Scale > 0I
+                
                 BigDecimal.Zero
 
         static member Abs( self : BigDecimal ) =
