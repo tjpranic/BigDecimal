@@ -21,8 +21,8 @@ let pi_ramanujan( iterations : int ) =
                 Fraction( ( 26390I * n ) + 1103I, pow( 396I, ( 4I * n ) ) )
             
             to_decimal(
-                [ for k in 1..iterations do yield sum_term_one( bigint( k ) ) *
-                                                  sum_term_two( bigint( k ) ) ]
+                [ for k in 1..iterations -> sum_term_one( bigint( k ) ) *
+                                            sum_term_two( bigint( k ) ) ]
                 |> List.sum )
 
         ( first_terms * bigdec( 1103 ) ) +           //when n = 0

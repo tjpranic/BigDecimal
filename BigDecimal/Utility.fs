@@ -26,3 +26,22 @@ module Utility =
     //Reverse a string
     let rev( s : string ) =
         new string( s.ToCharArray( ) |> Array.rev )
+
+    //Return a certain amount of zeroes in string form
+    let get_zeroes( amount : int ) =
+        [ for i in 0..amount -> "0" ] |> List.reduce( + )
+
+    //Split a string into certain sized groups
+    let group_string( str : string, group_size : int ) =
+        let rec group_loop( number : string, groups : string list ) =
+            if number.Length > 0 then
+                let group_and_number =
+                    if group_size < number.Length then
+                        ( number.Substring( 0, group_size ), number.Substring( group_size ) )
+                    else
+                        ( number, "" )
+                let groups = fst( group_and_number ) :: groups
+                group_loop( snd( group_and_number ), groups )
+            else
+                groups |> List.rev
+        group_loop( str, [] )

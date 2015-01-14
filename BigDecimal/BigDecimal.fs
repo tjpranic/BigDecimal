@@ -14,7 +14,7 @@ module BigDecimal =
             let result =
                 if decimal_pos < 0 then
                     //In case the number is supposed to have leading zeros
-                    ( 0, ( [ for i in 0..abs( decimal_pos ) - 1 do yield "0" ] |> List.reduce( + ) ) + s )
+                    ( 0, get_zeroes( abs( decimal_pos ) - 1 ) + s )
                 else
                     ( decimal_pos, s )
 
@@ -37,36 +37,23 @@ module BigDecimal =
             //Add leading zeros if necessary
             let prefix =
                 if zeroes_req then
-                    ( [ for i in 0..( root - index % root ) - 1 do yield "0" ] |> List.reduce( + ) )
+                    get_zeroes( ( root - index % root ) - 1 )
                 else
                     ""
             let number = prefix + number
 
-            let groups =
-                let temp =
-                    let rec group_loop( number : string, groups : String list ) =
-                        if number.Length > 0 then
-                            let group_and_number =
-                                if root < number.Length then
-                                    ( number.Substring( 0, root ), number.Substring( root ) )
-                                else
-                                    ( number, "" )
-                            let groups = fst( group_and_number ) :: groups
-                            group_loop( snd( group_and_number ), groups )
-                        else
-                            groups |> List.rev
-                    group_loop( number, [] )
+            let group = group_string( number, root )
 
-                //Add trailing zeros if necessary
-                let last = temp.[temp.Length - 1]
-                if last.Length <> root then
-                    let suffix = ( [ for i in 0..( root - last.Length ) - 1 do yield "0" ] |> List.reduce( + ) )
-                    temp |> List.mapi( fun i x -> if i = ( temp.Length - 1 ) then x + suffix else x )
-                else
-                    temp
+            //Add trailing zeros if necessary
+            let last = group.[group.Length - 1]
+            if last.Length <> root then
+                let suffix = get_zeroes( ( root - last.Length ) - 1 )
+                group |> List.mapi( fun i x -> if i = ( group.Length - 1 ) then x + suffix else x )
+            else
+                group
             
             //Remove groups of all zeroes
-            groups |> List.filter( fun x -> int( x ) <> 0 )
+            |> List.filter( fun x -> int( x ) <> 0 )
 
         let rec nth_root( groups : String list, digits : String list, x : bigint, y : bigint, r : bigint, alpha : bigint, beta : int, x2 : bigint, y2 : bigint, r2 : bigint, count : int ) =
             if count < precision then
@@ -79,7 +66,7 @@ module BigDecimal =
                 let numeric_base = 10I
 
                 let beta =
-                    [ for i in 0..9 do yield i ]
+                    [ for i in 0..9 -> i ]
                         |> List.rev
                         |> List.filter( fun beta -> ( ( ( numeric_base * y ) + bigint( beta ) ) ** root ) <= ( ( numeric_base ** root ) * x ) + alpha )
                         |> List.head
@@ -117,32 +104,23 @@ module BigDecimal =
         
         //Trim the number of unnecessary zeros
         let number =
-            let trim( s : string ) =
+            let trim_front( s : string ) =
                 let s =
                     let index = s.IndexOf( '.' )
-                    if index = -1 then
-                        s + ".0"
-                    else
-                        s
-                
-                //Trim the front
-                let pivot = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
-                let s = new string( s.ToCharArray( )
-                                        |> Array.mapi( fun i x -> if x = '0' && i < pivot && s.[i + 1] <> '.' then ' ' else x )
-                                        |> Array.filter( fun x -> x <> ' ' ) )
+                    if  index = -1 then s + ".0" else s
 
-                //Trim the back
-                let s = rev( s )
                 let pivot =
                     let temp = s.IndexOfAny( [| '1'; '2'; '3'; '4'; '5'; '6'; '7'; '8'; '9'; '.' |] )
-                    if temp = s.IndexOf( '.' ) then
-                        temp - 1
-                    else
-                        temp
-                new string( s.ToCharArray( )
-                                |> Array.mapi( fun i x -> if x = '0' && i < pivot then ' ' else x )
-                                |> Array.filter( fun x -> x <> ' ' )
-                                |> Array.rev )
+                    if  temp = s.IndexOf( '.' ) then temp - 1 else temp
+
+                new string( Array.sub ( s.ToCharArray( ) ) pivot ( s.Length - pivot ) )
+
+            let trim_back( s : string ) =
+                trim_front( s |> rev )
+    
+            let trim( s : string ) =
+                s |> trim_front |> trim_back |> rev
+
             trim( number )
 
         static let mutable precision = 50
