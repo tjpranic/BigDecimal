@@ -9,6 +9,8 @@ open BigDecimal.Utility
 //        )
 // Wolfram Alpha Query: 
 // 1 / ( (sqrt(8) / 9801) * sum ((4n)! / (n!)^4) * ((26390n + 1103) / 396^(4n)) n=0 to 5 )
+//
+// pi = 3.1415926535897932384626433832795028841971693993
 let pi_ramanujan( iterations : int ) =
     let reciprocal_pi =
         let first_terms = sqrt( bigdec( 8 ) ) / bigdec( 9801 )

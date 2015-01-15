@@ -133,11 +133,7 @@ module BigDecimal =
 
         //Number of zeros after the decimal point
         member public this.Scale : bigint =
-            let index = number.IndexOf( '.' )
-            if index = -1 then
-                0I
-            else
-                bigint( number.Length - ( index + 1 ) )
+            bigint( number.Length - ( number.IndexOf( '.' ) + 1 ) )
     
         //number parsed as a bigint
         member public this.Integer : bigint =
@@ -147,10 +143,10 @@ module BigDecimal =
                     raise( FormatException( "Multiple decimal points in input string" ) )
 
                 let index = number.IndexOf( '.' )
-                if index = -1 then
-                    number
-                else
+                if index <> -1 then
                     number.Remove( index, 1 )
+                else
+                    number
 
             let result = number_sans_point |> BigInteger.TryParse
 
@@ -235,19 +231,23 @@ module BigDecimal =
                 BigDecimal( quotient )
        
         static member Pow( self : BigDecimal, power : BigDecimal ) =
-            if self.Scale = 0I && power.Scale = 0I then
+            let readjusted_self  = self.Integer  / 10I
+            let readjusted_power = power.Integer / 10I
+
+            //TODO
+            if self.Scale = 1I && power.Scale = 1I then
                 if power.Integer > 0I then
-                    BigDecimal( pow( self.Integer, power.Integer ) )
+                    BigDecimal( pow( readjusted_self, readjusted_power ) )
                 else
-                    BigDecimal.One / BigDecimal( pow( self.Integer, abs( power.Integer ) ) )
-            else if self.Scale > 0I && power.Scale = 0I then
-                
+                    BigDecimal.One / BigDecimal( pow( readjusted_self, abs( readjusted_power ) ) )
+            else if self.Scale > 1I && power.Scale = 1I then
+                //
                 BigDecimal.Zero
-            else if self.Scale = 0I && power.Scale > 0I then
-                
+            else if self.Scale = 1I && power.Scale > 1I then
+                //
                 BigDecimal.Zero
-            else //self.Scale > 0I && power.Scale > 0I
-                
+            else // self.Scale > 1I && power.Scale > 1I
+                //
                 BigDecimal.Zero
 
         static member Abs( self : BigDecimal ) =
@@ -270,7 +270,7 @@ module BigDecimal =
                 match this with
                 | _ when this.Integer = other.Integer        -> -( this.Scale.CompareTo( other.Scale ) )
                 | _ when this.Scale = other.Scale            ->  this.Integer.CompareTo( other.Integer )
-                | _ when this.Scale = 0I || other.Scale = 0I ->  this.Integer.CompareTo( other.Integer ) //Special case
+                | _ when this.Scale = 1I || other.Scale = 1I ->  this.Integer.CompareTo( other.Integer ) //Special case
                 | _                                          -> -( this.Scale.CompareTo( other.Scale ) )
         
         override this.ToString( ) =
@@ -311,7 +311,7 @@ module BigDecimal =
         nth_root( 3, number )
 
     let is_decimal( number : BigDecimal ) =
-        number.Scale > 0I
+        number.Scale > 1I
 
     let is_whole( number : BigDecimal ) =
         not( is_decimal( number ) )
