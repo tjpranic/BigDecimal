@@ -15,10 +15,10 @@ module BigDecimal =
         static member ( * ) : BigDecimal * BigDecimal -> BigDecimal
         static member ( / ) : BigDecimal * BigDecimal -> BigDecimal
 
-        static member Pow : BigDecimal * BigDecimal -> BigDecimal
+        static member Pow : BigDecimal * bigint -> BigDecimal
         static member Abs : BigDecimal -> BigDecimal
 
-        static member ( ** ) : BigDecimal * BigDecimal -> BigDecimal
+        static member ( ** ) : BigDecimal * bigint -> BigDecimal
         static member ( ~- ) : BigDecimal -> BigDecimal
 
         interface IComparable
@@ -37,7 +37,7 @@ module BigDecimal =
     
     type bigdec = BigDecimal
 
-    val pow      : BigDecimal * BigDecimal -> BigDecimal
+    val pow      : BigDecimal * bigint -> BigDecimal
     val abs      : BigDecimal -> BigDecimal
     val nth_root : int * BigDecimal -> BigDecimal
     val sqrt     : BigDecimal -> BigDecimal

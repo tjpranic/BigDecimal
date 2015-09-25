@@ -53,7 +53,7 @@ module BigDecimal =
                 group
             
             //Remove groups of all zeroes
-            |> List.filter( fun x -> int( x ) <> 0 )
+            |> List.filter( fun x -> BigInteger.Parse( x ) <> 0I )
 
         let rec nth_root( groups : String list, digits : String list, x : bigint, y : bigint, r : bigint, alpha : bigint, beta : int, x2 : bigint, y2 : bigint, r2 : bigint, count : int ) =
             if count < precision then
@@ -230,25 +230,13 @@ module BigDecimal =
             else
                 BigDecimal( quotient )
        
-        static member Pow( self : BigDecimal, power : BigDecimal ) =
-            let readjusted_self  = self.Integer  / 10I
-            let readjusted_power = power.Integer / 10I
+        static member Pow( self : BigDecimal, power : bigint ) =
+            let readjusted_self = self.Integer / 10I
 
-            //TODO
-            if self.Scale = 1I && power.Scale = 1I then
-                if power.Integer > 0I then
-                    BigDecimal( pow( readjusted_self, readjusted_power ) )
-                else
-                    BigDecimal.One / BigDecimal( pow( readjusted_self, abs( readjusted_power ) ) )
-            else if self.Scale > 1I && power.Scale = 1I then
-                //
-                BigDecimal.Zero
-            else if self.Scale = 1I && power.Scale > 1I then
-                //
-                BigDecimal.Zero
-            else // self.Scale > 1I && power.Scale > 1I
-                //
-                BigDecimal.Zero
+            if power > 0I then
+                BigDecimal( pow( readjusted_self, power ) )
+            else
+                BigDecimal.One / BigDecimal( pow( readjusted_self, abs( power ) ) )
 
         static member Abs( self : BigDecimal ) =
             if self < BigDecimal.Zero then
@@ -256,7 +244,7 @@ module BigDecimal =
             else
                 self
 
-        static member ( ** )( self : BigDecimal, power : BigDecimal ) =
+        static member ( ** )( self : BigDecimal, power : bigint ) =
             BigDecimal.Pow( self, power )
 
         //Negation
@@ -295,7 +283,7 @@ module BigDecimal =
     
     type bigdec = BigDecimal
 
-    let pow( number : BigDecimal, power : BigDecimal ) =
+    let pow( number : BigDecimal, power : bigint ) =
         BigDecimal.Pow( number, power )
 
     let abs( number : BigDecimal ) =

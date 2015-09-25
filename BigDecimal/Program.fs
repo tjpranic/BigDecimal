@@ -34,6 +34,16 @@ let pi_ramanujan( iterations : int ) =
 
 [<EntryPoint>]
 let main argv =
-    printfn "%A" ( pi_ramanujan( 15 ) )
+    //printfn "%A\n" ( pi_ramanujan( 15 ) )
+
+    //BigDecimal.MaxPrecision <- 300
+    //let n = "9167486769200391580986609275853801624831066801443086224071265164279346570408670965932792057674808067900227830163549248523803357453169351119035965775473400756816883056208210161291328455648"
+    //try
+    //    printfn "%A" ( nth_root( 23, bigdec( n ) ) )
+    //with
+    //| ex -> printfn "%A\n%A" ex.Message ex.StackTrace
+
+    //printfn "\n%A" ( [ for i in 0..63 -> bigdec( 2 ) ** bigint( i ) ] |> List.sum )
+    //printfn "%A" ( bigdec( 2 ) ** 64I )
 
     0
