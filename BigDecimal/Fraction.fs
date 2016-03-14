@@ -46,19 +46,19 @@ module Fraction =
     
         //Fraction and Scalar arithmetic
         static member ( + )( self : Fraction, scalar : bigint ) =
-            //a + b/c = (ac + b)/c
-            let num = ( scalar * self.Denominator ) + self.Numerator
+            //b/c + a = (b + ac)/c
+            let num = self.Numerator + ( scalar * self.Denominator )
             let den = self.Denominator
             Fraction( num, den )
 
         static member ( - )( self : Fraction, scalar : bigint ) =
-            //a - b/c = (b - ac)/c
+            //b/c - a = (b - ac)/c
             let num = self.Numerator - ( scalar * self.Denominator )
             let den = self.Denominator
             Fraction( num, den )
 
         static member ( * )( self : Fraction, scalar : bigint ) =
-            //a * b/c = ab/c
+            //b/c * a = ab/c
             let num = scalar * self.Numerator
             let den = self.Denominator
             Fraction( num, den )
@@ -66,14 +66,15 @@ module Fraction =
         static member ( / )( self : Fraction, scalar : bigint ) =
             if scalar = 0I then
                 raise( DivideByZeroException( "Divisor cannot be 0" ) )
-            //a / b/c = b/ac
+            //b/c / a = ac/b
             let num = scalar * self.Denominator
             let den = self.Numerator
             Fraction( den, num )
 
+        //Scalar and Fraction arithmetic
         static member ( + )( scalar : bigint, self : Fraction ) =
             //a + b/c = (ac + b)/c
-            let num = ( scalar * self.Denominator ) + self.Numerator
+            let num = self.Numerator + ( scalar * self.Denominator )
             let den = self.Denominator
             Fraction( num, den )
 
