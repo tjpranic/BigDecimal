@@ -1,5 +1,5 @@
 ﻿open FSharpMath.BigDecimal
-open FSharpMath.Fraction
+open FSharpMath.BigFraction
 open FSharpMath.BigInteger
 
 open System
@@ -15,7 +15,7 @@ open System.Numerics
 //
 // pi = 3.1415926535897932384626433832795028841971693993
 let pi_ramanujan ( iterations : int ) =
-    let fraction_to_decimal( n : Fraction ) =
+    let BigFraction_to_decimal( n : BigFraction ) =
         if n.Numerator <> 0I && n.Denominator <> 0I then
                 BigDecimal( n.Numerator ) / BigDecimal( n.Denominator )
             else
@@ -26,12 +26,12 @@ let pi_ramanujan ( iterations : int ) =
         
         let second_terms ( iterations : int ) =
             let sum_term_one ( n : bigint ) =
-                Fraction( ( 4I * n ).factorial( ), n.factorial( ).power( 4I ) )
+                BigFraction( ( 4I * n ).factorial( ), n.factorial( ).power( 4I ) )
                 
             let sum_term_two ( n : bigint ) =
-                Fraction( ( 26390I * n ) + 1103I, 396I.power( 4I * n ) )
+                BigFraction( ( 26390I * n ) + 1103I, 396I.power( 4I * n ) )
                 
-            fraction_to_decimal ( [ for k in 1..iterations -> sum_term_one ( BigInteger( k ) ) * sum_term_two ( BigInteger( k ) ) ] |> List.sum )
+            BigFraction_to_decimal ( [ for k in 1..iterations -> sum_term_one ( BigInteger( k ) ) * sum_term_two ( BigInteger( k ) ) ] |> List.sum )
             
         ( first_terms * BigDecimal( 1103 ) ) +    //when n = 0
         ( first_terms * second_terms iterations ) //when n > 0
