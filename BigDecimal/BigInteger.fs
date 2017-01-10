@@ -1,4 +1,4 @@
-﻿namespace FSharpMath
+﻿namespace Math
 
 module BigInteger =
     
@@ -6,14 +6,14 @@ module BigInteger =
     
     type BigInteger with
         
-        member this.factorial( ) =
-            match this with
-            | _ when this = 0I -> this
-            | _ when this = 1I -> this
-            | _ -> [ 1I..this ] |> List.reduce ( * )
+        static member factorial ( n : BigInteger ) =
+            match n with
+            | _ when n = 0I -> 1I
+            | _ when n = 1I -> n
+            | _             -> [ 1I..n ] |> List.reduce ( * )
         
-        member this.power( x : BigInteger ) =
+        static member power ( n : BigInteger ) ( x : BigInteger ) =
             match x with
             | _ when x = 0I -> 1I
-            | _ when x = 1I -> this
-            | _ -> [ for i in 1I..x do yield this ] |> List.reduce ( * )
+            | _ when x = 1I -> n
+            | _             -> [ for i in 1I..x do yield n ] |> List.reduce ( * )

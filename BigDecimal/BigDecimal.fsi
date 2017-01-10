@@ -1,4 +1,4 @@
-﻿namespace FSharpMath
+﻿namespace Math
 
 module BigDecimal =
     
@@ -11,31 +11,34 @@ module BigDecimal =
         static member Zero : BigDecimal
         static member One  : BigDecimal
         
-        static member ( + ) : BigDecimal * BigDecimal -> BigDecimal
-        static member ( - ) : BigDecimal * BigDecimal -> BigDecimal
-        static member ( * ) : BigDecimal * BigDecimal -> BigDecimal
-        static member ( / ) : BigDecimal * BigDecimal -> BigDecimal
+        static member (  + ) : BigDecimal * BigDecimal -> BigDecimal
+        static member (  - ) : BigDecimal * BigDecimal -> BigDecimal
+        static member (  * ) : BigDecimal * BigDecimal -> BigDecimal
+        static member (  / ) : BigDecimal * BigDecimal -> BigDecimal
+        static member ( ** ) : BigDecimal * BigInteger -> BigDecimal
+        static member ( ~- ) : BigDecimal -> BigDecimal
         
         static member Pow : BigDecimal * BigInteger -> BigDecimal
         static member Abs : BigDecimal -> BigDecimal
         
-        static member ( ** ) : BigDecimal * BigInteger -> BigDecimal
-        static member ( ~- ) : BigDecimal -> BigDecimal
-        
-        member public power    : BigInteger -> BigDecimal
-        member public abs      : unit -> BigDecimal
-        member public nth_root : int  -> BigDecimal
-        member public sqrt     : unit -> BigDecimal
-        member public cbrt     : unit -> BigDecimal
-        
-        member public is_decimal : unit -> bool
-        member public is_whole   : unit -> bool
-        
-        member public to_biginteger : unit -> BigInteger
-        
-        member public floor   : unit -> BigDecimal
-        member public ceiling : unit -> BigDecimal
-        member public round   : unit -> BigDecimal
+        static member power        : BigDecimal -> BigInteger -> BigDecimal
+        static member nthRoot      : BigDecimal -> int32      -> BigDecimal
+        static member squareRoot   : BigDecimal -> BigDecimal
+        static member cubeRoot     : BigDecimal -> BigDecimal
+        static member abs          : BigDecimal -> BigDecimal
+        static member floor        : BigDecimal -> BigDecimal
+        static member ceiling      : BigDecimal -> BigDecimal
+        static member round        : BigDecimal -> BigDecimal
+        static member isDecimal    : BigDecimal -> bool
+        static member isWhole      : BigDecimal -> bool
+        static member toBigInteger : BigDecimal -> BigInteger
+
+        static member op_Equality           : BigDecimal * BigDecimal -> bool
+        static member op_Inequality         : BigDecimal * BigDecimal -> bool
+        static member op_LessThan           : BigDecimal * BigDecimal -> bool
+        static member op_LessThanOrEqual    : BigDecimal * BigDecimal -> bool
+        static member op_GreaterThan        : BigDecimal * BigDecimal -> bool
+        static member op_GreaterThanOrEqual : BigDecimal * BigDecimal -> bool
         
         interface IComparable
         

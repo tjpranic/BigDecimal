@@ -1,16 +1,11 @@
-﻿namespace FSharpMath
+﻿namespace Math
 
 module BigFraction =
     
     open System
     open System.Numerics
+    open Math.BigDecimal
     
-    let rec gcd ( x : BigInteger ) ( y : BigInteger ) =
-        if y = 0I then
-            x
-        else
-            gcd y ( x % y )
-            
     type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
         
         do
@@ -24,97 +19,149 @@ module BigFraction =
         member public this.Denominator = denominator
         
         static member ( + )( self : BigFraction, other : BigFraction ) =
-            //a/b + c/d = (a*d + c*b)/b*d
             let numerator   = ( self.Numerator * other.Denominator ) + ( other.Numerator * self.Denominator )
             let denominator = self.Denominator * other.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( - )( self : BigFraction, other : BigFraction ) =
-            //a/b - c/d = (a*d - c*b)/b*d
             let numerator   = ( self.Numerator * other.Denominator ) - ( other.Numerator * self.Denominator )
             let denominator = self.Denominator * other.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( * )( self : BigFraction, other : BigFraction ) =
-            //a/b * c/d = a*c/b*d
             let numerator   = self.Numerator * other.Numerator
             let denominator = self.Denominator * other.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( / )( self : BigFraction, other : BigFraction ) =
-            //a/b / c/d = a*d/b*c
             let numerator   = self.Numerator * other.Denominator
             let denominator = self.Denominator * other.Numerator
             BigFraction( numerator, denominator )
-            
+        
         static member ( + )( self : BigFraction, scalar : BigInteger ) =
-            //b/c + a = (b + ac)/c
             let numerator   = self.Numerator + ( scalar * self.Denominator )
             let denominator = self.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( - )( self : BigFraction, scalar : BigInteger ) =
-            //b/c - a = (b - ac)/c
             let numerator   = self.Numerator - ( scalar * self.Denominator )
             let denominator = self.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( * )( self : BigFraction, scalar : BigInteger ) =
-            //b/c * a = ab/c
             let numerator   = scalar * self.Numerator
             let denominator = self.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( / )( self : BigFraction, scalar : BigInteger ) =
             if scalar = 0I then
                 raise( DivideByZeroException( "Divisor cannot be 0" ) )
-            //b/c / a = ac/b
             let numerator = scalar * self.Denominator
             let denominator = self.Numerator
             BigFraction( denominator, numerator )
-            
+        
         static member ( + )( scalar : BigInteger, self : BigFraction ) =
-            //a + b/c = (ac + b)/c
             let numerator   = self.Numerator + ( scalar * self.Denominator )
             let denominator = self.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( - )( scalar : BigInteger, self : BigFraction ) =
-            //a - b/c = (ac - b)/c
             let numerator   = ( scalar * self.Denominator ) - self.Numerator
             let denominator = self.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( * )( scalar : BigInteger, self : BigFraction ) =
-            //a * b/c = ab/c
             let numerator   = scalar * self.Numerator
             let denominator = self.Denominator
             BigFraction( numerator, denominator )
-            
+        
         static member ( / )( scalar : BigInteger, self : BigFraction ) =
             if scalar = 0I then
                 raise( DivideByZeroException( "Divisor cannot be 0" ) )
-            //a / b/c = ac/b
             let numerator   = scalar * self.Denominator
             let denominator = self.Numerator
             BigFraction( numerator, denominator )
-            
+        
         static member ( ~- )( self : BigFraction ) =
             BigFraction( -self.Numerator, -self.Denominator )
-            
-        member public this.simplify( ) =
-            let numerator   = this.Numerator   / ( gcd this.Numerator this.Denominator )
-            let denominator = this.Denominator / ( gcd this.Numerator this.Denominator )
+        
+        static member gcd ( x : BigInteger ) ( y : BigInteger ) =
+            if y = 0I then
+                x
+            else
+                BigFraction.gcd y ( x % y )
+        
+        static member simplify ( n : BigFraction ) =
+            let numerator   = n.Numerator   / ( BigFraction.gcd n.Numerator n.Denominator )
+            let denominator = n.Denominator / ( BigFraction.gcd n.Numerator n.Denominator )
             BigFraction( numerator, denominator )
-            
+        
+        static member toBigDecimal ( n : BigFraction ) =
+            if n.Numerator <> 0I && n.Denominator <> 0I then
+                BigDecimal( n.Numerator ) / BigDecimal( n.Denominator )
+            else
+                BigDecimal( 0 )
+        
+        static member op_Equality( self : BigFraction, other : BigFraction ) =
+            let self  = BigFraction.simplify self
+            let other = BigFraction.simplify other
+            self.Numerator = other.Numerator && self.Denominator = other.Denominator
+        
+        static member op_Inequality( self : BigFraction, other : BigFraction ) =
+            not ( self = other )
+        
+        static member op_LessThan( self : BigFraction, other : BigFraction ) =
+            let self  = BigFraction.simplify self
+            let other = BigFraction.simplify other
+            if self.Denominator = other.Denominator then
+                self.Numerator < other.Numerator
+            else
+                self.Denominator > other.Denominator
+        
+        static member op_LessThanOrEqual( self : BigFraction, other : BigFraction ) =
+            let self  = BigFraction.simplify self
+            let other = BigFraction.simplify other
+            if self.Denominator = other.Denominator then
+                self.Numerator >= other.Numerator
+            else
+                self.Denominator <= other.Denominator
+        
+        static member op_GreaterThan( self : BigFraction, other : BigFraction ) =
+            let self  = BigFraction.simplify self
+            let other = BigFraction.simplify other
+            if self.Denominator = other.Denominator then
+                self.Numerator > other.Numerator
+            else
+                self.Denominator < other.Denominator
+        
+        static member op_GreaterThanOrEqual( self : BigFraction, other : BigFraction ) =
+            let self  = BigFraction.simplify self
+            let other = BigFraction.simplify other
+            if self.Denominator = other.Denominator then
+                self.Numerator >= other.Numerator
+            else
+                self.Denominator <= other.Denominator
+        
+        interface IComparable with
+            member this.CompareTo( obj ) =
+                match obj with
+                | null           -> 1
+                | :? BigFraction ->
+                    let other = ( obj :?> BigFraction )
+                    match this with
+                    | _ when this < other -> -1
+                    | _ when this = other ->  0
+                    | _ (*this > other*)  ->  1
+                | _ -> raise <| InvalidOperationException( "Unable to compare object." )
+        
         override this.ToString( ) =
             string( this.Numerator ) + "/" + string( this.Denominator )
-            
+        
         override this.Equals( other ) =
             let other = other :?> BigFraction //throws InvalidCastException on failure
             ( this.Numerator = other.Numerator ) && ( this.Denominator = other.Denominator )
-            
+        
         override this.GetHashCode( ) =
             ( this.Numerator.GetHashCode( ) * 17 ) + this.Denominator.GetHashCode( )
-            
+        
         new( ) = BigFraction( 1I, 1I )

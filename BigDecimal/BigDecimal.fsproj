@@ -46,6 +46,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="String.fs" />
     <Compile Include="BigInteger.fs" />
     <Compile Include="BigDecimal.fsi" />
     <Compile Include="BigDecimal.fs" />
