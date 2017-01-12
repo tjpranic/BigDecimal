@@ -9,7 +9,7 @@ module BigInteger =
         | _ when n = 1I -> n
         | _             -> [ 1I..n ] |> List.reduce ( * )
     
-    let power ( n : BigInteger ) ( x : BigInteger ) =
+    let pow ( x : BigInteger ) ( n : BigInteger ) =
         match x with
         | _ when x = 0I -> 1I
         | _ when x = 1I -> n

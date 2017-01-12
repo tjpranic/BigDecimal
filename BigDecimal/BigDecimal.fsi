@@ -51,7 +51,7 @@ module BigDecimal =
     val isDecimal    : BigDecimal -> bool
     val isWhole      : BigDecimal -> bool
     val parse        : string     -> BigDecimal
-    val pow          : BigDecimal -> BigInteger -> BigDecimal
+    val pow          : BigInteger -> BigDecimal -> BigDecimal
     val nthrt        : int32      -> BigDecimal -> BigDecimal
     val sqrt         : BigDecimal -> BigDecimal
     val cbrt         : BigDecimal -> BigDecimal

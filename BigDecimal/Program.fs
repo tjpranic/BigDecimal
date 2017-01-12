@@ -15,8 +15,8 @@ let piRamanujan ( iterations : int32 ) =
         let term1 = BigDecimal.sqrt( BigDecimal( 8 ) ) / BigDecimal( 9801 )
         let term2 ( iterations : int32 ) =
             [ for k in 1I..BigInteger( iterations ) ->
-                BigFraction( ( BigInteger.factorial ( 4I * k ) ), ( BigInteger.power ( BigInteger.factorial k ) 4I ) ) *
-                BigFraction( ( 26390I * k ) + 1103I, ( BigInteger.power 396I ( 4I * k ) ) ) ]
+                BigFraction( BigInteger.factorial ( 4I * k ), k |> BigInteger.factorial |> BigInteger.pow 4I ) *
+                BigFraction( ( 26390I * k ) + 1103I, 396I |> BigInteger.pow ( 4I * k ) ) ]
                     |> List.sum
                     |> BigFraction.toBigDecimal
         ( term1 * BigDecimal( 1103 ) ) + ( term1 * ( term2 iterations ) )

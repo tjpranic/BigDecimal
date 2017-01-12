@@ -234,7 +234,7 @@ module BigDecimal =
     let parse ( s : string ) =
         BigDecimal( s )
     
-    let pow ( n : BigDecimal ) ( power : BigInteger ) =
+    let pow ( power : BigInteger ) ( n : BigDecimal ) =
         BigDecimal.Pow( n, power )
     
     let nthrt ( root : int32 ) ( n : BigDecimal ) =
