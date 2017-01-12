@@ -47,14 +47,17 @@ type BigDecimal =
 [<CompilationRepresentation( CompilationRepresentationFlags.ModuleSuffix )>]
 module BigDecimal =
     
-    val power        : BigDecimal -> BigInteger -> BigDecimal
-    val nthRoot      : BigDecimal -> int32      -> BigDecimal
-    val squareRoot   : BigDecimal -> BigDecimal
-    val cubeRoot     : BigDecimal -> BigDecimal
-    val abs          : BigDecimal -> BigDecimal
-    val floor        : BigDecimal -> BigDecimal
-    val ceiling      : BigDecimal -> BigDecimal
-    val round        : BigDecimal -> BigDecimal
+    val toBigInteger : BigDecimal -> BigInteger
     val isDecimal    : BigDecimal -> bool
     val isWhole      : BigDecimal -> bool
-    val toBigInteger : BigDecimal -> BigInteger
+    val parse        : string     -> BigDecimal
+    val pow          : BigDecimal -> BigInteger -> BigDecimal
+    val nthrt        : int32      -> BigDecimal -> BigDecimal
+    val sqrt         : BigDecimal -> BigDecimal
+    val cbrt         : BigDecimal -> BigDecimal
+    val abs          : BigDecimal -> BigDecimal
+    val floor        : BigDecimal -> BigDecimal
+    val ceil         : BigDecimal -> BigDecimal
+    val round        : int32      -> BigDecimal -> BigDecimal
+    val integer      : BigDecimal -> BigInteger
+    val fractional   : BigDecimal -> BigDecimal

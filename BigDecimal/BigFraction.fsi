@@ -45,6 +45,8 @@ type BigFraction =
 [<CompilationRepresentation( CompilationRepresentationFlags.ModuleSuffix )>]
 module BigFraction =
     
+    val toBigDecimal : BigFraction -> BigDecimal
     val gcd          : BigInteger  -> BigInteger -> BigInteger
     val simplify     : BigFraction -> BigFraction
-    val toBigDecimal : BigFraction -> BigDecimal
+    
+    

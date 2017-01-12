@@ -160,14 +160,15 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
 [<CompilationRepresentation( CompilationRepresentationFlags.ModuleSuffix )>]
 module BigFraction =
     
+    let toBigDecimal ( n : BigFraction ) =
+        if n.Numerator <> 0I && n.Denominator <> 0I then
+            BigDecimal( n.Numerator ) / BigDecimal( n.Denominator )
+        else
+            BigDecimal( 0 )
+    
     let gcd ( x : BigInteger ) ( y : BigInteger ) =
         BigFraction.gcd x y
     
     let simplify ( n : BigFraction ) =
         BigFraction.simplify n
     
-    let toBigDecimal ( n : BigFraction ) =
-        if n.Numerator <> 0I && n.Denominator <> 0I then
-            BigDecimal( n.Numerator ) / BigDecimal( n.Denominator )
-        else
-            BigDecimal( 0 )
