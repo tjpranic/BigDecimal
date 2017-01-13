@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BigDecimal", "BigDecimal\BigDecimal.fsproj", "{120B0ABA-48E7-4903-892C-65F436C90340}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "BigDecimal", "BigDecimal\BigDecimal.fsproj", "{5050F8D8-E1A8-4B2B-A187-7EF470C039E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{120B0ABA-48E7-4903-892C-65F436C90340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{120B0ABA-48E7-4903-892C-65F436C90340}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{120B0ABA-48E7-4903-892C-65F436C90340}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{120B0ABA-48E7-4903-892C-65F436C90340}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5050F8D8-E1A8-4B2B-A187-7EF470C039E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5050F8D8-E1A8-4B2B-A187-7EF470C039E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5050F8D8-E1A8-4B2B-A187-7EF470C039E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5050F8D8-E1A8-4B2B-A187-7EF470C039E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

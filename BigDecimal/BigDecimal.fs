@@ -22,6 +22,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
     
     //digits of the number as a BigInteger
     member public this.Integer : BigInteger = integer
+    
     //number of zeros after the decimal point
     member public this.Scale : int32 = scale
     
@@ -75,6 +76,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
                     |> List.rev
                     |> List.mapi   ( fun i x -> if i = 0 then x.ToString( ) + "." else x.ToString( ) ) //insert decimal point
                     |> List.reduce ( + )
+                    |> BigDecimal
             else
                 let dividend =
                     if remainder < adjustedDivisor then
@@ -82,7 +84,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
                     else
                         dividend
                 longDivide dividend digits
-        BigDecimal( longDivide adjustedDividend [] )
+        longDivide adjustedDividend []
     
     static member ( ** )( self : BigDecimal, power : BigInteger ) =
         BigDecimal.Pow( self, power )
@@ -94,7 +96,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
         if power > 0I then
             [ for i in 1I..power do yield self ] |> List.reduce ( * )
         else
-            BigDecimal.One / ( self ** abs( power ) )
+            BigDecimal.One / BigDecimal.Pow( self, abs( power ) )
     
     static member Abs( self : BigDecimal ) =
         if self < BigDecimal.Zero then
@@ -226,7 +228,7 @@ module BigDecimal =
             n.Integer
     
     let isDecimal ( n : BigDecimal ) =
-        n.Scale > 1
+        n.Scale > 0
     
     let isWhole ( n : BigDecimal ) =
         not ( isDecimal n )
@@ -246,7 +248,11 @@ module BigDecimal =
         
         let groups =
             let index  = string.IndexOf( '.' )
-            let string = string.Remove( index, 1 )
+            let string =
+                if index <> -1 then
+                    string.Remove( index, 1 )
+                else
+                    string
             
             //add leading zeros if necessary
             let prefix =
@@ -270,13 +276,7 @@ module BigDecimal =
             |> List.filter ( fun x -> BigInteger.Parse( x ) <> 0I )
         
         let radix  = 10I
-        let rec extractRootDigits ( digits : int32 list )
-                                  ( x      : BigInteger  )
-                                  ( y      : BigInteger  )
-                                  ( r      : BigInteger  )
-                                  ( alpha  : BigInteger  )
-                                  ( beta   : int32       )
-                                  ( count  : int32       ) =
+        let rec extractRootDigits ( x : BigInteger ) ( y : BigInteger ) ( r : BigInteger ) ( alpha : BigInteger ) ( beta : int32 ) ( count : int32 ) ( digits : int32 list ) =
             if count = BigDecimal.Precision then
                 digits |> List.rev
             else
@@ -296,9 +296,9 @@ module BigDecimal =
                 let y = ( radix * y ) + BigInteger( beta )
                 let r = x - ( y ** root )
                 
-                extractRootDigits ( beta :: digits ) x y r alpha beta ( count + 1 )
+                extractRootDigits x y r alpha beta ( count + 1 ) ( beta :: digits )
         
-        let digits = extractRootDigits [] 0I 0I 0I 0I 0 0
+        let digits = extractRootDigits 0I 0I 0I 0I 0 0 []
         
         //determine where decimal point goes (if needed)
         let index = string.IndexOf( '.' )
@@ -311,10 +311,9 @@ module BigDecimal =
             else
                 -1
         
-        BigDecimal(
-            digits |> List.map    ( fun x -> x.ToString( ) )
-                   |> List.mapi   ( fun i x -> if i = position then "." + x else x ) //insert decimal point (if needed)
-                   |> List.reduce ( + ) )
+        digits |> List.mapi   ( fun i x -> if i = position then "." + x.ToString( ) else x.ToString( ) ) //insert decimal point (if needed)
+               |> List.reduce ( + )
+               |> BigDecimal
     
     let sqrt ( n : BigDecimal ) =
         nthrt 2 n
@@ -336,6 +335,7 @@ module BigDecimal =
             let string = n.ToString( )
             let index  = string.IndexOf( '.' ) + 1 + place
             let digit  = Int32.Parse( string.[index].ToString( ) )
+            
             if digit < 5 then
                 BigDecimal( string.Substring( 0, index ) )
             else
@@ -349,6 +349,7 @@ module BigDecimal =
         if isDecimal n then
             let string = n.ToString( )
             let index  = string.IndexOf( '.' )
+            
             BigInteger.Parse( string.Substring( 0, index ) )
         else
             n.Integer
@@ -357,6 +358,7 @@ module BigDecimal =
         if isDecimal n then
             let string = n.ToString( )
             let index  = string.IndexOf( '.' )
+            
             BigDecimal( "0." + string.Substring( index + 1 ) )
         else
             BigDecimal.Zero

@@ -50,7 +50,7 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
     
     static member ( / )( self : BigFraction, scalar : BigInteger ) =
         if scalar = 0I then raise <| DivideByZeroException( "Divisor cannot be 0." )
-        let numerator = scalar * self.Denominator
+        let numerator   = scalar * self.Denominator
         let denominator = self.Numerator
         BigFraction( denominator, numerator )
     

@@ -3,7 +3,7 @@ open System.Numerics
 open BigMath
 
 //Ramanujan's formula for pi:
-//1 / pi = sqrt( 8 ) / 9801 * sum[0->inf]( ( (4n)! / (n!)^4 ) * ( ( 26390n + 1103 ) / 396^(4n) ) ) )
+//1 / pi = sqrt( 8 ) / 9801 * sum[n = 0->inf]( ( (4n)! / (n!)^4 ) * ( ( 26390n + 1103 ) / 396^(4n) ) ) )
 //
 //WolframAlpha query:
 //1 / ( ( sqrt( 8 ) / 9801 ) * sum ( ( 4n )! / ( n! )^4 ) * ( ( 26390n + 1103 ) / 396^( 4n ) ) n=0 to 5 )
@@ -12,17 +12,15 @@ open BigMath
 //3.1415926535897932384626433832795028841971693993...
 let piRamanujan ( iterations : int32 ) =
     let reciprocalPi =
-        let term1 = BigDecimal.sqrt( BigDecimal( 8 ) ) / BigDecimal( 9801 )
-        let term2 ( iterations : int32 ) =
-            [ for k in 1I..BigInteger( iterations ) ->
-                BigFraction( BigInteger.factorial ( 4I * k ), k |> BigInteger.factorial |> BigInteger.pow 4I ) *
-                BigFraction( ( 26390I * k ) + 1103I, 396I |> BigInteger.pow ( 4I * k ) ) ]
-                    |> List.sum
-                    |> BigFraction.toBigDecimal
-        ( term1 * BigDecimal( 1103 ) ) + ( term1 * ( term2 iterations ) )
+        BigDecimal.sqrt( BigDecimal( 8 ) ) / BigDecimal( 9801 ) *
+        ( [ for k in 0I..BigInteger( iterations ) ->
+            BigFraction( ( 4I * k ) |> BigInteger.factorial, k |> BigInteger.factorial |> BigInteger.pow 4I ) *
+            BigFraction( ( 26390I * k ) + 1103I, 396I |> BigInteger.pow ( 4I * k ) ) ]
+                |> List.sum
+                |> BigFraction.toBigDecimal )
     BigDecimal( 1 ) / reciprocalPi
 
-//TODO: update project to VS2015
+//TODO: convert to a library
 //TODO: add tests (test equality operators, .Equals, .CompareTo in BigFraction, BigDecimal)
 //TODO? add [<CompiledName( "..." )>] attributes
 [<EntryPoint>]
