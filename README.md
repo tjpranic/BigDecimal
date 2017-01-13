@@ -6,9 +6,7 @@ Arbitrary precision decimal class, built on top of the .NET BigInteger, written 
 Usage
 -----------
 
-NOTE: Probably have to have the F# runtime installed.
-
-Build project with Visual Studio 2012 or higher and run.
+Build project with Visual Studio 2015 or higher and run.
 
 Future Considerations & Concerns
 -----------
