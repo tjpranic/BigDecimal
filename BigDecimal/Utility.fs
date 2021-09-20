@@ -50,4 +50,3 @@ module BigInteger =
         | _ when x = 0I -> 1I
         | _ when x = 1I -> n
         | _             -> [ for i in 1I..x do yield n ] |> List.reduce ( * )
-    
