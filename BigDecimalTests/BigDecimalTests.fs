@@ -268,6 +268,14 @@ module BigDecimalTests =
     let ``BigDecimal.isDecimal( BigDecimal( 345.43 ) )`` ( ) =
         ( BigDecimal.isDecimal( BigDecimal( 345.43 ) ) ) |> should be True
 
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.isDecimal( BigDecimal( 458.10 ) )`` ( ) =
+        ( BigDecimal.isDecimal( BigDecimal( 458.10 ) ) ) |> should be True
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.isDecimal( BigDecimal( 17.0 ) )`` ( ) =
+        ( BigDecimal.isDecimal( BigDecimal( 17.0 ) ) ) |> should not' ( be True )
+
     // isWhole
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.isWhole( BigDecimal( 895 ) )`` ( ) =
@@ -276,6 +284,14 @@ module BigDecimalTests =
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.isWhole( BigDecimal( 23.479 ) )`` ( ) =
         ( BigDecimal.isWhole( BigDecimal( 23.479 ) ) ) |> should not' ( be True )
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.isWhole( BigDecimal( 753238.0 ) )`` ( ) =
+        ( BigDecimal.isWhole( BigDecimal( 753238.0 ) ) ) |> should be True
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.isWhole( BigDecimal( 5420.10 ) )`` ( ) =
+        ( BigDecimal.isWhole( BigDecimal( 5420.10 ) ) ) |> should not' ( be True )
 
     // parse
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
@@ -308,15 +324,27 @@ module BigDecimalTests =
     let ``BigDecimal( 9167486769200391580986609275853801624831066801443086224071265164279346570408670965932792057674808067900227830163549248523803357453169351119035965775473400756816883056208210161291328455648I ) |> BigDecimal.nthrt 23`` ( ) =
         ( BigDecimal( 9167486769200391580986609275853801624831066801443086224071265164279346570408670965932792057674808067900227830163549248523803357453169351119035965775473400756816883056208210161291328455648I ) |> BigDecimal.nthrt 23 ) |> should equal ( BigDecimal( "134522054.33137513807694048238669278806693778558635" ) )
 
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal( 524744532468751923546122657597368049278513737089035272057324643668607677682302892208099365234375I ) |> BigDecimal.sqrt`` ( ) =
+        ( BigDecimal( 524744532468751923546122657597368049278513737089035272057324643668607677682302892208099365234375I ) |> BigDecimal.nthrt 55 ) |> should equal ( BigDecimal( 55 ) )
+
     // sqrt
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal( 64 ) |> BigDecimal.sqrt`` ( ) =
         ( BigDecimal( 64 ) |> BigDecimal.sqrt ) |> should equal ( BigDecimal( 8 ) )
 
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal( 5512302774030124943872810675876I ) |> BigDecimal.sqrt`` ( ) =
+        ( BigDecimal( 5512302774030124943872810675876I ) |> BigDecimal.sqrt ) |> should equal ( BigDecimal( 2347829374982374I ) )
+
     // cbrt
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal( 125 ) |> BigDecimal.cbrt`` ( ) =
         ( BigDecimal( 125 ) |> BigDecimal.cbrt ) |> should equal ( BigDecimal( 5 ) )
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal( 817125237437950405613816441I ) |> BigDecimal.cbrt`` ( ) =
+        ( BigDecimal( 817125237437950405613816441I ) |> BigDecimal.cbrt ) |> should equal ( BigDecimal( 934895081I ) )
 
     // abs
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
@@ -377,6 +405,10 @@ module BigDecimalTests =
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal( 0 ) |> BigDecimal.round`` ( ) =
         ( BigDecimal( 0 ) |> BigDecimal.round 80 ) |> should equal ( BigDecimal( 0 ) )
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal( -384.39 ) |> BigDecimal.round`` ( ) =
+        ( BigDecimal( -384.39 ) |> BigDecimal.round 1 ) |> should equal ( BigDecimal( -384.4 ) )
 
     // whole
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
