@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="BigFractionTests.fs" />
     <Compile Include="BigDecimalTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

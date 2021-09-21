@@ -90,6 +90,12 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
         let denominator = n.Denominator / ( BigFraction.gcd n.Numerator n.Denominator )
         BigFraction( numerator, denominator )
 
+    static member toBigDecimal ( n : BigFraction ) =
+        if n.Numerator <> 0I && n.Denominator <> 0I then
+            BigDecimal( n.Numerator ) / BigDecimal( n.Denominator )
+        else
+            BigDecimal( 0 )
+
     static member op_Equality( self : BigFraction, other : BigFraction ) =
         let self  = BigFraction.simplify self
         let other = BigFraction.simplify other
@@ -99,36 +105,22 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
         not ( self = other )
 
     static member op_LessThan( self : BigFraction, other : BigFraction ) =
-        let self  = BigFraction.simplify self
-        let other = BigFraction.simplify other
-        if self.Denominator = other.Denominator then
-            self.Numerator < other.Numerator
-        else
-            self.Denominator > other.Denominator
+        BigFraction.toBigDecimal( self ) < BigFraction.toBigDecimal( other )
 
     static member op_LessThanOrEqual( self : BigFraction, other : BigFraction ) =
-        let self  = BigFraction.simplify self
-        let other = BigFraction.simplify other
-        if self.Denominator = other.Denominator then
-            self.Numerator >= other.Numerator
-        else
-            self.Denominator <= other.Denominator
+        match self with
+        | _ when self = other -> true
+        | _                   -> self < other
 
     static member op_GreaterThan( self : BigFraction, other : BigFraction ) =
-        let self  = BigFraction.simplify self
-        let other = BigFraction.simplify other
-        if self.Denominator = other.Denominator then
-            self.Numerator > other.Numerator
-        else
-            self.Denominator < other.Denominator
+        match self with
+        | _ when self = other -> false
+        | _                   -> not ( self < other )
 
     static member op_GreaterThanOrEqual( self : BigFraction, other : BigFraction ) =
-        let self  = BigFraction.simplify self
-        let other = BigFraction.simplify other
-        if self.Denominator = other.Denominator then
-            self.Numerator >= other.Numerator
-        else
-            self.Denominator <= other.Denominator
+        match self with
+        | _ when self = other -> true
+        | _                   -> not ( self < other )
 
     interface IComparable with
         member this.CompareTo( obj ) =
@@ -154,7 +146,11 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
     override this.GetHashCode( ) =
         ( this.Numerator.GetHashCode( ) * 17 ) + this.Denominator.GetHashCode( )
 
-    new( ) = BigFraction( 1I, 1I )
+    new( numerator :  int32, denominator :  int32 ) = BigFraction( BigInteger( numerator ), BigInteger( denominator ) )
+    new( numerator :  int64, denominator :  int64 ) = BigFraction( BigInteger( numerator ), BigInteger( denominator ) )
+    new( numerator : uint32, denominator : uint32 ) = BigFraction( BigInteger( numerator ), BigInteger( denominator ) )
+    new( numerator : uint64, denominator : uint64 ) = BigFraction( BigInteger( numerator ), BigInteger( denominator ) )
+    new( )                                          = BigFraction( 1I, 1I )
 
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation( CompilationRepresentationFlags.ModuleSuffix )>]

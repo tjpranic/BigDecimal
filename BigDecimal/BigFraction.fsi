@@ -39,7 +39,11 @@ type BigFraction =
     override GetHashCode : unit -> int32
 
     new : BigInteger * BigInteger -> BigFraction
-    new : unit -> BigFraction
+    new : int32      * int32      -> BigFraction
+    new : int64      * int64      -> BigFraction
+    new : uint32     * uint32     -> BigFraction
+    new : uint64     * uint64     -> BigFraction
+    new : unit                    -> BigFraction
 
 [<RequireQualifiedAccess>]
 [<CompilationRepresentation( CompilationRepresentationFlags.ModuleSuffix )>]

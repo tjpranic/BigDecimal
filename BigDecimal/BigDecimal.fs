@@ -104,6 +104,24 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
         else
             self
 
+    static member whole ( n : BigDecimal ) =
+        if n.Scale > 0 then
+            let string = n.ToString( )
+            let index  = string.IndexOf( '.' )
+
+            BigInteger.Parse( string.Substring( 0, index ) )
+        else
+            n.Digits
+
+    static member fractional ( n : BigDecimal ) =
+        if n.Scale > 0 then
+            let string = n.ToString( )
+            let index  = string.IndexOf( '.' )
+
+            BigDecimal( "0." + string.Substring( index + 1 ) )
+        else
+            BigDecimal.Zero
+
     static member op_Equality( self : BigDecimal, other : BigDecimal ) =
         self.Digits = other.Digits && self.Scale = other.Scale
 
@@ -111,50 +129,32 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
         not ( self = other )
 
     static member op_LessThan( self : BigDecimal, other : BigDecimal ) =
-        let whole ( n : BigDecimal ) =
-            if n.Scale > 0 then
-                let string = n.ToString( )
-                let index  = string.IndexOf( '.' )
-
-                BigInteger.Parse( string.Substring( 0, index ) )
-            else
-                n.Digits
-
-        let fractional ( n : BigDecimal ) =
-            if n.Scale > 0 then
-                let string = n.ToString( )
-                let index  = string.IndexOf( '.' )
-
-                BigDecimal( "0." + string.Substring( index + 1 ) )
-            else
-                BigDecimal.Zero
-
-        let wholeSelf       = whole( self )
-        let wholeOther      = whole( other )
-        let fractionalSelf  = fractional( self )
-        let fractionalOther = fractional( other )
+        let wholeSelf       = BigDecimal.whole( self )
+        let wholeOther      = BigDecimal.whole( other )
+        let fractionalSelf  = BigDecimal.fractional( self )
+        let fractionalOther = BigDecimal.fractional( other )
 
         match wholeSelf with
         | _ when wholeSelf = wholeOther ->
             match fractionalSelf with
             | _ when fractionalSelf = fractionalOther -> false
-            | _ -> fractionalSelf < fractionalOther
+            | _ -> fractionalSelf.ToString( ) < fractionalOther.ToString( )
         | _ -> wholeSelf < wholeOther
 
     static member op_LessThanOrEqual( self : BigDecimal, other : BigDecimal ) =
         match self with
         | _ when self = other -> true
-        | _                   -> self.Digits < other.Digits
+        | _                   -> self < other
 
     static member op_GreaterThan( self : BigDecimal, other : BigDecimal ) =
         match self with
         | _ when self = other -> false
-        | _                   -> not ( self.Digits < other.Digits )
+        | _                   -> not ( self < other )
 
     static member op_GreaterThanOrEqual( self : BigDecimal, other : BigDecimal ) =
         match self with
         | _ when self = other -> true
-        | _                   -> not ( self.Digits < other.Digits )
+        | _                   -> not ( self < other )
 
     interface IComparable with
         member this.CompareTo( obj ) =
@@ -367,19 +367,7 @@ module BigDecimal =
             n
 
     let whole ( n : BigDecimal ) =
-        if isDecimal n then
-            let string = n.ToString( )
-            let index  = string.IndexOf( '.' )
-
-            BigInteger.Parse( string.Substring( 0, index ) )
-        else
-            n.Digits
+        BigDecimal.whole( n )
 
     let fractional ( n : BigDecimal ) =
-        if isDecimal n then
-            let string = n.ToString( )
-            let index  = string.IndexOf( '.' )
-
-            BigDecimal( "0." + string.Substring( index + 1 ) )
-        else
-            BigDecimal.Zero
+        BigDecimal.fractional( n )

@@ -1,6 +1,6 @@
-namespace BigMath
+namespace BigMath.Tests
 
-module Tests =
+module BigDecimalTests =
 
     open NUnit.Framework
     open FsUnit
@@ -233,8 +233,8 @@ module Tests =
         ( BigDecimal( 101.10 ) > BigDecimal.Zero ) |> should be True
 
     [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
-    let ``8.7445 >= 31.45`` ( ) =
-        ( BigDecimal.op_GreaterThanOrEqual( BigDecimal( 8.7445 ) , BigDecimal( 31.45 ) ) ) |> should be True
+    let ``874.45 >= 31.45`` ( ) =
+        ( BigDecimal.op_GreaterThanOrEqual( BigDecimal( 874.45 ), BigDecimal( 31.45 ) ) ) |> should be True
 
     [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
     let ``234.32 >= 724.101`` ( ) =
@@ -278,7 +278,6 @@ module Tests =
     let ``BigDecimal.isWhole( BigDecimal( 23.479 ) )`` ( ) =
         ( BigDecimal.isWhole( BigDecimal( 23.479 ) ) ) |> should not' ( be True )
 
-
     // parse
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.parse( "8221" )`` ( ) =
@@ -287,6 +286,10 @@ module Tests =
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.parse( "345.78" )`` ( ) =
         ( BigDecimal.parse( "345.78" ) ) |> should equal ( BigDecimal( 345.78 ) )
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.parse( "00000000.024120000000" )`` ( ) =
+        ( BigDecimal.parse( "00000000.024120000000" ) ) |> should equal ( BigDecimal( 0.02412 ) )
 
     // pow
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
