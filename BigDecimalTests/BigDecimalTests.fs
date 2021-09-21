@@ -268,7 +268,6 @@ module BigDecimalTests =
     let ``BigDecimal.isDecimal( BigDecimal( 345.43 ) )`` ( ) =
         ( BigDecimal.isDecimal( BigDecimal( 345.43 ) ) ) |> should be True
 
-
     // isWhole
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.isWhole( BigDecimal( 895 ) )`` ( ) =
@@ -290,6 +289,10 @@ module BigDecimalTests =
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.parse( "00000000.024120000000" )`` ( ) =
         ( BigDecimal.parse( "00000000.024120000000" ) ) |> should equal ( BigDecimal( 0.02412 ) )
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.parse( "hi :^)" )`` ( ) =
+        ( fun ( ) -> BigDecimal.parse( "hi :^)" ) |> ignore ) |> should ( throwWithMessage "Unable to parse number." ) typeof<System.FormatException>
 
     // pow
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
@@ -345,6 +348,10 @@ module BigDecimalTests =
     let ``BigDecimal( 20.9 ) |> BigDecimal.floor`` ( ) =
         ( BigDecimal( 20.9 ) |> BigDecimal.floor ) |> should equal ( BigDecimal( 20 ) )
 
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal( -606.32 ) |> BigDecimal.floor`` ( ) =
+        ( BigDecimal( -606.32 ) |> BigDecimal.floor ) |> should equal ( BigDecimal( -607 ) )
+
     // ceil
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal( 87.3 ) |> BigDecimal.ceil`` ( ) =
@@ -353,6 +360,10 @@ module BigDecimalTests =
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal( 10.85 ) |> BigDecimal.ceil`` ( ) =
         ( BigDecimal( 10.85 ) |> BigDecimal.ceil ) |> should equal ( BigDecimal( 11 ) )
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal( -421.203 ) |> BigDecimal.ceil`` ( ) =
+        ( BigDecimal( -421.203 ) |> BigDecimal.ceil ) |> should equal ( BigDecimal( -421 ) )
 
     // round
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]

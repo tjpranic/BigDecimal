@@ -346,10 +346,16 @@ module BigDecimal =
         BigDecimal.Abs n
 
     let floor ( n : BigDecimal ) =
-        BigDecimal( toBigInteger n )
+        match n with
+        | _ when n > BigDecimal.Zero -> BigDecimal( toBigInteger n )
+        | _ when n < BigDecimal.Zero -> BigDecimal( toBigInteger n ) - BigDecimal.One
+        | _                          -> BigDecimal.Zero
 
     let ceil ( n : BigDecimal ) =
-        BigDecimal( toBigInteger n ) + BigDecimal.One
+        match n with
+        | _ when n > BigDecimal.Zero -> BigDecimal( toBigInteger n ) + BigDecimal.One
+        | _ when n < BigDecimal.Zero -> BigDecimal( toBigInteger n )
+        | _                          -> BigDecimal.Zero
 
     let round ( place : int32 ) ( n : BigDecimal ) =
         if isDecimal n then
