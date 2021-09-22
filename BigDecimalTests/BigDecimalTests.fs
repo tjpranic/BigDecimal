@@ -34,6 +34,26 @@ module BigDecimalTests =
     let ``-7`` ( ) =
         -BigDecimal( 7 ) |> should equal ( BigDecimal( -7 ) )
 
+    [<Test>][<CategoryAttribute( "Basic Integer Arithmetic" )>]
+    let ``38.24 / 0`` ( ) =
+        ( fun ( ) -> BigDecimal( 38.24 ) / BigDecimal.Zero |> ignore ) |> should ( throwWithMessage "Cannot divide by 0." ) typeof<System.DivideByZeroException>
+
+    [<Test>][<CategoryAttribute( "Basic Integer Arithmetic" )>]
+    let ``22 + 1000000000001`` ( ) =
+        BigDecimal( 22 ) + BigDecimal( 1000000000001I ) |> should equal ( BigDecimal( 1000000000023I ) )
+
+    [<Test>][<CategoryAttribute( "Basic Integer Arithmetic" )>]
+    let ``123456789 - 9`` ( ) =
+        BigDecimal( 123456789I ) - BigDecimal( 9 ) |> should equal ( BigDecimal( 123456780I ) )
+
+    [<Test>][<CategoryAttribute( "Basic Integer Arithmetic" )>]
+    let ``41 * 2222222222222`` ( ) =
+        BigDecimal( 41 ) * BigDecimal( 2222222222222I ) |> should equal ( BigDecimal( 91111111111102I ) )
+
+    [<Test>][<CategoryAttribute( "Basic Integer Arithmetic" )>]
+    let ``6050438340473 / 12`` ( ) =
+        BigDecimal( 6050438340473I ) / BigDecimal( 12 ) |> should equal ( BigDecimal( "504203195039.4166666666666666666666666666666666666666666666666" ) )
+
     // Big integer arithmetic
     [<Test>][<CategoryAttribute( "Big Integer Arithmetic" )>]
     let ``254620731853134930495577620177954948666364525784465071337198373805011 + 100113479515521784939047616965575940940020476738291134367703611737635`` ( ) =
@@ -249,6 +269,11 @@ module BigDecimalTests =
     let ``BigDecimal( 56.8937 ).ToString( )`` ( ) =
         ( BigDecimal( 56.8937 ).ToString( ) ) |> should equal "56.8937"
 
+    // Precision
+    [<Test>]
+    let ``BigDecimal.Precision <- -10`` ( ) =
+        ( fun ( ) -> BigDecimal.Precision <- -10 ) |> should ( throwWithMessage "Precision cannot be less than 1." ) typeof<System.InvalidOperationException>
+
     // BigDecimal functions
     // toBigInteger
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
@@ -307,8 +332,20 @@ module BigDecimalTests =
         ( BigDecimal.parse( "00000000.024120000000" ) ) |> should equal ( BigDecimal( 0.02412 ) )
 
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.parse( "198.162.0.1" )`` ( ) =
+        ( fun ( ) -> BigDecimal.parse( "198.162.0.1" ) |> ignore ) |> should ( throwWithMessage "Multiple decimal points in input string." ) typeof<System.FormatException>
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
     let ``BigDecimal.parse( "hi :^)" )`` ( ) =
         ( fun ( ) -> BigDecimal.parse( "hi :^)" ) |> ignore ) |> should ( throwWithMessage "Unable to parse number." ) typeof<System.FormatException>
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.parse( "" )`` ( ) =
+        ( fun ( ) -> BigDecimal.parse( "" ) |> ignore ) |> should ( throwWithMessage "String cannot be empty or null." ) typeof<System.ArgumentException>
+
+    [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]
+    let ``BigDecimal.parse( null )`` ( ) =
+        ( fun ( ) -> BigDecimal.parse( null ) |> ignore ) |> should ( throwWithMessage "String cannot be empty or null." ) typeof<System.ArgumentException>
 
     // pow
     [<Test>][<CategoryAttribute( "BigDecimal Functions" )>]

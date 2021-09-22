@@ -43,6 +43,10 @@ module BigFractionTest =
         BigFraction( 1, 2 ) / 2I |> should equal ( BigFraction( 1, 4 ) )
 
     [<Test>][<CategoryAttribute( "Basic Fraction Arithmetic" )>]
+    let ``7/3 / 0`` ( ) =
+        ( fun ( ) -> BigFraction( 7, 3 ) / 0I |> ignore ) |> should ( throwWithMessage "Cannot divide by 0." ) typeof<System.DivideByZeroException>
+
+    [<Test>][<CategoryAttribute( "Basic Fraction Arithmetic" )>]
     let ``3 + 1/2`` ( ) =
         3I + BigFraction( 1, 2 ) |> should equal ( BigFraction( 7, 2 ) )
 
@@ -61,6 +65,10 @@ module BigFractionTest =
     [<Test>][<CategoryAttribute( "Basic Fraction Arithmetic" )>]
     let ``-( 1/2 )`` ( ) =
         -BigFraction( 1, 2 ) |> should equal ( BigFraction( -1, -2 ) )
+
+    [<Test>][<CategoryAttribute( "Basic Fraction Arithmetic" )>]
+    let ``0 / 5/2`` ( ) =
+        ( fun ( ) -> 0I / BigFraction( 5, 2 ) |> ignore ) |> should ( throwWithMessage "Cannot divide by 0." ) typeof<System.DivideByZeroException>
 
     // Big fraction arithmetic
     [<Test>][<CategoryAttribute( "Big Fraction Arithmetic" )>]
@@ -313,7 +321,7 @@ module BigFractionTest =
     [<Test>][<CategoryAttribute( "BigFraction Functions" )>]
     let ``BigFraction.gcd( 127144272669033402721615502794369798167731115826745846187558635513356185563153245280362492900422I, 842771202850740534882081196824012306408634167772516449266913527966436340995251125919666690706424I )`` ( ) =
         ( BigFraction.gcd 127144272669033402721615502794369798167731115826745846187558635513356185563153245280362492900422I 842771202850740534882081196824012306408634167772516449266913527966436340995251125919666690706424I )
-        |> should equal 2I
+            |> should equal 2I
 
     [<Test>][<CategoryAttribute( "BigFraction Functions" )>]
     let ``BigFraction.gcd( 0I, 44I )`` ( ) =

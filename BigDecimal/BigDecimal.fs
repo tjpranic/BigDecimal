@@ -67,14 +67,13 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
                 self.Digits
 
         // DIVIDE
-        let rec longDivide ( dividend : BigInteger ) ( digits : int32 list ) =
+        let rec longDivide ( dividend : BigInteger ) ( digits : BigInteger list ) =
             let quotient, remainder = BigInteger.DivRem( dividend, adjustedDivisor )
-            // Quotient will always be a single digit in this algorithm
-            let digits = int32( quotient ) :: digits
+            let digits = quotient :: digits
             if remainder = 0I || digits.Length = BigDecimal.Precision then
                 digits
                     |> List.rev
-                    |> List.mapi   ( fun i x -> if i = 0 then x.ToString( ) + "." else x.ToString( ) ) //insert decimal point
+                    |> List.mapi   ( fun i x -> if i = 0 then x.ToString( ) + "." else x.ToString( ) ) // Insert decimal point
                     |> List.reduce ( + )
                     |> BigDecimal
             else
@@ -207,7 +206,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             let numberSansPoint =
                 let points = number.ToCharArray( ) |> Array.filter ( fun x -> x = '.' ) |> Array.length
                 if points > 1 then raise <| FormatException( "Multiple decimal points in input string." )
-                
+
                 let index = number.IndexOf( '.' )
                 if index <> -1 then
                     number.Remove( index, 1 )
@@ -260,6 +259,7 @@ module BigDecimal =
     let pow ( power : BigInteger ) ( n : BigDecimal ) =
         BigDecimal.Pow( n, power )
 
+    // Can only accept integer roots due to String and Seq functions
     let nthrt ( root : int32 ) ( n : BigDecimal ) =
         let string =
             if n.Scale = 0 then

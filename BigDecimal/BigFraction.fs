@@ -24,12 +24,12 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
         BigFraction( numerator, denominator )
 
     static member ( * )( self : BigFraction, other : BigFraction ) =
-        let numerator   = self.Numerator * other.Numerator
+        let numerator   = self.Numerator   * other.Numerator
         let denominator = self.Denominator * other.Denominator
         BigFraction( numerator, denominator )
 
     static member ( / )( self : BigFraction, other : BigFraction ) =
-        let numerator   = self.Numerator * other.Denominator
+        let numerator   = self.Numerator   * other.Denominator
         let denominator = self.Denominator * other.Numerator
         BigFraction( numerator, denominator )
 
@@ -49,7 +49,7 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
         BigFraction( numerator, denominator )
 
     static member ( / )( self : BigFraction, scalar : BigInteger ) =
-        if scalar = 0I then raise <| DivideByZeroException( "Divisor cannot be 0." )
+        if scalar = 0I then raise <| DivideByZeroException( "Cannot divide by 0." )
         let numerator   = scalar * self.Denominator
         let denominator = self.Numerator
         BigFraction( denominator, numerator )
@@ -70,7 +70,7 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
         BigFraction( numerator, denominator )
 
     static member ( / )( scalar : BigInteger, self : BigFraction ) =
-        if scalar = 0I then raise <| DivideByZeroException( "Divisor cannot be 0." )
+        if scalar = 0I then raise <| DivideByZeroException( "Cannot divide by 0." )
         let numerator   = scalar * self.Denominator
         let denominator = self.Numerator
         BigFraction( numerator, denominator )
