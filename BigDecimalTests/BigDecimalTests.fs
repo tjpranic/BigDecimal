@@ -166,6 +166,10 @@ module BigDecimalTests =
         ( BigDecimal( 48.75 ) < BigDecimal.Zero ) |> should not' ( be True )
 
     [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
+    let ``-0.123456789 < 0`` ( ) =
+        ( BigDecimal( "-0.123456789" ) < BigDecimal.Zero ) |> should be True
+
+    [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
     let ``191.841 < 240.623`` ( ) =
         ( BigDecimal.op_LessThan( BigDecimal( 191.841 ) , BigDecimal( 240.623 ) ) ) |> should be True
 
@@ -222,6 +226,10 @@ module BigDecimalTests =
     [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
     let ``833.3 > 0`` ( ) =
         ( BigDecimal( 833.3 ) > BigDecimal.Zero ) |> should be True
+
+    [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
+    let ``-0.987654321 > 0`` ( ) =
+        ( BigDecimal( "-0.987654321" ) > BigDecimal.Zero ) |> should not' ( be True )
 
     [<Test>][<CategoryAttribute( "BigDecimal Comparison Operators" )>]
     let ``435.642 > 12.3347`` ( ) =

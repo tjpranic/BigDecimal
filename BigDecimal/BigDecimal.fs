@@ -117,7 +117,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             let string = n.ToString( )
             let index  = string.IndexOf( '.' )
 
-            BigDecimal( "0." + string.Substring( index + 1 ) )
+            BigDecimal( ( if n.Digits < 0I then "-" else "" ) + "0." + string.Substring( index + 1 ) )
         else
             BigDecimal.Zero
 
@@ -168,18 +168,28 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             | _ -> raise <| InvalidOperationException( "Unable to compare object." )
 
     override this.ToString( ) =
-        let string = string( this.Digits )
-        if this.Scale > 0 then
-            let position, string =
-                let position = string.Length - this.Scale
-                if position < 0 then
-                    ( 0, ( String.replicate ( abs position ) "0" ) + string ) // In case the number is supposed to have leading zeros
-                else
-                    ( position, string )
-            let notation = if position = 0 then "0." else "."
-            string.Insert( position, notation )
-        else
-            string
+        let isNegative = this.Digits < 0I
+
+        let string =
+            if isNegative then
+                string( this.Digits ).Substring( 1 )
+            else
+                string( this.Digits )
+
+        let string =
+            if this.Scale > 0 then
+                let position, string =
+                    let position = string.Length - this.Scale
+                    if position < 0 then
+                        ( 0, ( String.replicate ( abs position ) "0" ) + string ) // In case the number is supposed to have leading zeros
+                    else
+                        ( position, string )
+                let notation = if position = 0 then "0." else "."
+                string.Insert( position, notation )
+            else
+                string
+
+        if isNegative then "-" + string else string
 
     override this.Equals( obj ) =
         match obj with
@@ -202,8 +212,19 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             |  0, _ -> "0" + trimmed
             |  _, _ -> trimmed
 
+        let isNegative =
+            n.[0] = '-';
+
         let integer =
-            let numberSansPoint =
+            // Remove the sign
+            let number =
+                if isNegative then
+                    number.Substring( 1 )
+                else
+                    number
+
+            // Remove the decimal point
+            let number =
                 let points = number.ToCharArray( ) |> Array.filter ( fun x -> x = '.' ) |> Array.length
                 if points > 1 then raise <| FormatException( "Multiple decimal points in input string." )
 
@@ -212,11 +233,11 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
                     number.Remove( index, 1 )
                 else
                     number
-            
-            let result, integer = BigInteger.TryParse numberSansPoint
+
+            let result, integer = BigInteger.TryParse number
             if not result then raise <| FormatException( "Unable to parse number." )
-            
-            integer
+
+            if isNegative then -integer else integer
 
         let scale =
             let index = number.IndexOf( '.' )
