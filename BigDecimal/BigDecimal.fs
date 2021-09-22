@@ -4,9 +4,9 @@ open System
 open System.Numerics
 open Utility
 
-type BigDecimal( integer : BigInteger, scale : int32  ) =
+type BigDecimal( integer : BigInteger, magnitude : int32  ) =
 
-    do if scale < 0 then raise <| InvalidOperationException( "Scale cannot be less than zero." )
+    do if magnitude < 0 then raise <| InvalidOperationException( "Scale cannot be less than zero." )
 
     static let mutable precision = 50
     static member Precision
@@ -23,46 +23,46 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
     // Digits of the number as a BigInteger
     member public this.Digits : BigInteger = integer
 
-    // Number of zeros after the decimal point
-    member public this.Scale : int32 = scale
+    // Number of zeroes after the decimal point
+    member public this.Magnitude : int32 = magnitude
 
     static member ( + )( self : BigDecimal, other : BigDecimal ) =
-        let smallerScale,   largerScale   = minmax self.Scale   other.Scale
-        let smallerInteger, largerInteger = minmax self.Digits other.Digits
+        let smallerMagnitude, largerMagnitude = minmax self.Magnitude other.Magnitude
+        let smallerInteger,   largerInteger   = minmax self.Digits    other.Digits
 
-        // Align the scales
-        let adjustedInteger = smallerInteger * ( BigInteger.Pow ( 10I, ( largerScale - smallerScale ) ) )
+        // Align the magnitudes
+        let adjustedInteger = smallerInteger * ( BigInteger.Pow ( 10I, ( largerMagnitude - smallerMagnitude ) ) )
 
-        BigDecimal( ( largerInteger + adjustedInteger ), largerScale )
+        BigDecimal( ( largerInteger + adjustedInteger ), largerMagnitude )
 
     static member ( - )( self : BigDecimal, other : BigDecimal ) =
-        let smallerScale,   largerScale   = minmax self.Scale   other.Scale
-        let smallerInteger, largerInteger = minmax self.Digits other.Digits
+        let smallerMagnitude, largerMagnitude = minmax self.Magnitude other.Magnitude
+        let smallerInteger,   largerInteger   = minmax self.Digits    other.Digits
 
-        let adjustedInteger = smallerInteger * ( BigInteger.Pow ( 10I, ( largerScale - smallerScale ) ) )
+        let adjustedInteger = smallerInteger * ( BigInteger.Pow ( 10I, ( largerMagnitude - smallerMagnitude ) ) )
 
-        let result = BigDecimal( ( largerInteger - adjustedInteger ), largerScale )
+        let result = BigDecimal( ( largerInteger - adjustedInteger ), largerMagnitude )
         if self.Digits < other.Digits then
             -result
         else
             result
 
     static member ( * )( self : BigDecimal, other : BigDecimal ) =
-        BigDecimal( ( self.Digits * other.Digits ), ( self.Scale + other.Scale ) )
+        BigDecimal( ( self.Digits * other.Digits ), ( self.Magnitude + other.Magnitude ) )
 
     static member ( / )( self : BigDecimal, other : BigDecimal ) =
         if other.Digits = 0I then raise <| DivideByZeroException( "Cannot divide by 0." )
 
-        // Align the divisor and dividend scale if necessary
+        // Align the divisor and dividend magnitude if necessary
         let adjustedDivisor =
-            if other.Scale < self.Scale then
-                other.Digits * ( BigInteger.Pow ( 10I, ( self.Scale - other.Scale ) ) )
+            if other.Magnitude < self.Magnitude then
+                other.Digits * ( BigInteger.Pow ( 10I, ( self.Magnitude - other.Magnitude ) ) )
             else
                 other.Digits
 
         let adjustedDividend =
-            if other.Scale > self.Scale then
-                self.Digits * ( BigInteger.Pow ( 10I, ( other.Scale - self.Scale ) ) )
+            if other.Magnitude > self.Magnitude then
+                self.Digits * ( BigInteger.Pow ( 10I, ( other.Magnitude - self.Magnitude ) ) )
             else
                 self.Digits
 
@@ -89,7 +89,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
         BigDecimal.Pow( self, power )
 
     static member ( ~- )( self : BigDecimal ) =
-        BigDecimal( -self.Digits, self.Scale )
+        BigDecimal( -self.Digits, self.Magnitude )
 
     static member Pow( self : BigDecimal, power : BigInteger ) =
         if power > 0I then
@@ -104,7 +104,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             self
 
     static member whole ( n : BigDecimal ) =
-        if n.Scale > 0 then
+        if n.Magnitude > 0 then
             let string = n.ToString( )
             let index  = string.IndexOf( '.' )
 
@@ -113,7 +113,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             n.Digits
 
     static member fractional ( n : BigDecimal ) =
-        if n.Scale > 0 then
+        if n.Magnitude > 0 then
             let string = n.ToString( )
             let index  = string.IndexOf( '.' )
 
@@ -122,7 +122,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
             BigDecimal.Zero
 
     static member op_Equality( self : BigDecimal, other : BigDecimal ) =
-        self.Digits = other.Digits && self.Scale = other.Scale
+        self.Digits = other.Digits && self.Magnitude = other.Magnitude
 
     static member op_Inequality( self : BigDecimal, other : BigDecimal ) =
         not ( self = other )
@@ -177,9 +177,9 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
                 string( this.Digits )
 
         let string =
-            if this.Scale > 0 then
+            if this.Magnitude > 0 then
                 let position, string =
-                    let position = string.Length - this.Scale
+                    let position = string.Length - this.Magnitude
                     if position < 0 then
                         ( 0, ( String.replicate ( abs position ) "0" ) + string ) // In case the number is supposed to have leading zeros
                     else
@@ -198,7 +198,7 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
         | _             -> false
 
     override this.GetHashCode( ) =
-        ( this.Digits.GetHashCode( ) * 17 ) + this.Scale.GetHashCode( )
+        ( this.Digits.GetHashCode( ) * 17 ) + this.Magnitude.GetHashCode( )
 
     new( n : string ) =
         if n = "" || n = null then raise <| ArgumentException( "String cannot be empty or null." )
@@ -239,14 +239,14 @@ type BigDecimal( integer : BigInteger, scale : int32  ) =
 
             if isNegative then -integer else integer
 
-        let scale =
+        let magnitude =
             let index = number.IndexOf( '.' )
             if index <> -1 then
                 number.Length - ( index + 1 )
             else
                 0
 
-        BigDecimal( integer, scale )
+        BigDecimal( integer, magnitude )
 
     new( n : decimal    ) = BigDecimal( string( n ) )
     new( n : double     ) = BigDecimal( string( n ) )
@@ -269,7 +269,7 @@ module BigDecimal =
             n.Digits
 
     let isDecimal ( n : BigDecimal ) =
-        n.Scale > 0
+        n.Magnitude > 0
 
     let isWhole ( n : BigDecimal ) =
         not ( isDecimal n )
@@ -283,7 +283,7 @@ module BigDecimal =
     // Can only accept integer roots due to String and Seq functions
     let nthrt ( root : int32 ) ( n : BigDecimal ) =
         let string =
-            if n.Scale = 0 then
+            if n.Magnitude = 0 then
                 n.ToString( ) + ".0" // Required to compute the position of the decimal point
             else
                 n.ToString( )
