@@ -1,12 +1,12 @@
 BigDecimal
 ==========
 
-Arbitrary precision decimal class, built on top of the .NET BigInteger, written in F# + other stuff
+Arbitrary precision decimal class, built on top of the .NET BigInteger, written in F#
 
 Usage
 -----------
 
-Build project with Visual Studio 2015 or higher and run.
+Build project with Visual Studio 2019 or higher and run.
 
 Future Considerations & Concerns
 -----------
@@ -17,7 +17,7 @@ License
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Thomas Pranic
+Copyright (c) 2021 Thomas Pranic
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
