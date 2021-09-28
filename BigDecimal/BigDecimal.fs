@@ -77,12 +77,7 @@ type BigDecimal( integer : BigInteger, magnitude : int32  ) =
                     |> List.reduce ( + )
                     |> BigDecimal
             else
-                let dividend =
-                    if remainder < adjustedDivisor then
-                        remainder * 10I
-                    else
-                        dividend
-                longDivide dividend digits
+                longDivide ( if remainder < adjustedDivisor then remainder * 10I else dividend ) digits
         longDivide adjustedDividend []
 
     static member ( ** )( self : BigDecimal, power : BigInteger ) =
@@ -172,6 +167,7 @@ type BigDecimal( integer : BigInteger, magnitude : int32  ) =
 
         let string =
             if isNegative then
+                // Remove the -
                 string( this.Digits ).Substring( 1 )
             else
                 string( this.Digits )
@@ -201,7 +197,7 @@ type BigDecimal( integer : BigInteger, magnitude : int32  ) =
         ( this.Digits.GetHashCode( ) * 17 ) + this.Magnitude.GetHashCode( )
 
     new( n : string ) =
-        if n = "" || n = null then raise <| ArgumentException( "String cannot be empty or null." )
+        if n = null || n.Trim( ) = "" then raise <| ArgumentException( "String cannot be empty or null." )
 
         // Trim the number of unnecessary zeros, if they exist
         let number =
@@ -280,6 +276,7 @@ module BigDecimal =
     let pow ( power : BigInteger ) ( n : BigDecimal ) =
         BigDecimal.Pow( n, power )
 
+    // https://en.wikipedia.org/wiki/Shifting_nth_root_algorithm
     // Can only accept integer roots due to String and Seq functions
     let nthrt ( root : int32 ) ( n : BigDecimal ) =
         let string =

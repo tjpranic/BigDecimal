@@ -80,10 +80,9 @@ type BigFraction( numerator : BigInteger, denominator : BigInteger ) =
 
     // These need to be static members because the comparison operators/method depend on them
     static member gcd ( x : BigInteger ) ( y : BigInteger ) =
-        if y = 0I then
-            x
-        else
-            BigFraction.gcd y ( x % y )
+        match y with
+        | _ when y = 0I -> x
+        | _             -> BigFraction.gcd y ( x % y )
 
     static member simplify ( n : BigFraction ) =
         let numerator   = n.Numerator   / ( BigFraction.gcd n.Numerator n.Denominator )
